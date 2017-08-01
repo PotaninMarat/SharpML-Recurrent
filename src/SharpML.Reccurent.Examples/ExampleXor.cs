@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SharpML.Reccurent.Examples.Data;
-using SharpML.Recurrent;
 using SharpML.Recurrent.DataStructs;
 using SharpML.Recurrent.Models;
 using SharpML.Recurrent.Networks;
@@ -36,26 +32,29 @@ namespace SharpML.Reccurent.Examples
 
 
             int reportEveryNthEpoch = 10;
-            int trainingEpochs = 100000;
+            int trainingEpochs = 11000;
 
             Trainer.train<NeuralNetwork>(trainingEpochs, learningRate, nn, data, reportEveryNthEpoch, rng);
 
-            Console.WriteLine("Training Completed.");
-            Console.WriteLine("Test: 1,1");
+            Console.WriteLine("Обучение завершено.");
+            Console.WriteLine("Тестирование: 1,1");
 
             Matrix input = new Matrix(new double[] {1, 1});
             Graph g = new Graph(false);
             Matrix output = nn.Activate(input, g);
 
-            Console.WriteLine("Test: 1,1. Output:" + output.W[0]);
+            Console.WriteLine("Тестирование: 1,1. Ответ:" + output.W[0]);
 
             Matrix input1 = new Matrix(new double[] { 0, 1 });
             Graph g1 = new Graph(false);
             Matrix output1 = nn.Activate(input1, g1);
 
-            Console.WriteLine("Test: 0,1. Output:" + output1.W[0]);
+            Console.WriteLine("Тестирование: 0,1. Ответ:" + output1.W[0]);
 
-            Console.WriteLine("done.");
+            Console.WriteLine("Завершено.");
+
+            Console.ReadKey(true);
+
         }
     }
 }

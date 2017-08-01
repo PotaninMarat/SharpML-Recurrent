@@ -1,13 +1,13 @@
 # SharpML-Recurrent
-A C# implemetation of Andrej Karpathy's RecurrentJs and Thomas Lahore's RecurrentJava.
+Выполнение реплики проекта Андрея Корпатого "RecurrentJs" и Thomas Lahore's "RecurrentJava" на языке C#.
 
-Features:
+Особенности:
 
-- Deep Recurrent Neural Networks
-- Long Short-Term Memory Networks
-- Gated Recurrent Unit Neural Networks
-- Backpropagation Through Time handled via Automatic Differentiation.
+- Глубинная рекуррентная сеть
+- LSTM сеть
+- Нейронная сеть GRU
+- Обратное рапространение ошибки идет с помощью автоматического диференцирования.
 
 
-#License
+#Лицензия
 MIT

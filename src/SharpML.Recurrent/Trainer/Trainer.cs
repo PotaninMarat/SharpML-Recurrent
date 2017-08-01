@@ -30,7 +30,7 @@ namespace SharpML.Recurrent.Trainer
             Console.WriteLine("--------------------------------------------------------------");
             if (initFromSaved)
             {
-                Console.WriteLine("initializing network from saved state...");
+                Console.WriteLine("Инициализация нейронной сети и сохранение состояния...");
                 try
                 {
                     network = (INetwork)Binary.ReadFromBinary<T>(savePath);
@@ -47,7 +47,7 @@ namespace SharpML.Recurrent.Trainer
             for (int epoch = 0; epoch < trainingEpochs; epoch++)
             {
 
-                String show = "epoch[" + (epoch + 1) + "/" + trainingEpochs + "]";
+                String show = "Эпоха[" + (epoch + 1) + "/" + trainingEpochs + "]";
 
                 double reportedLossTrain = Pass(learningRate, network, data.Training, true, data.LossTraining, data.LossReporting);
                 result = reportedLossTrain;
@@ -67,14 +67,14 @@ namespace SharpML.Recurrent.Trainer
                     reportedLossTesting = Pass(learningRate, network, data.Testing, false, data.LossTraining, data.LossReporting);
                     result = reportedLossTesting;
                 }
-                show += "\ttrain loss = " + String.Format("{0:N5}", reportedLossTrain);
+                show += "\tОшибка обучения = " + String.Format("{0:N5}", reportedLossTrain);
                 if (data.Validation != null)
                 {
-                    show += "\tvalid loss = " + String.Format("{0:N5}", reportedLossValidation);
+                    show += "\tОшибка валидации = " + String.Format("{0:N5}", reportedLossValidation);
                 }
                 if (data.Testing != null)
                 {
-                    show += "\ttest loss  = " + String.Format("{0:N5}", reportedLossTesting);
+                    show += "\tОшибка тестирования  = " + String.Format("{0:N5}", reportedLossTesting);
                 }
                 Console.WriteLine(show);
 
@@ -91,7 +91,7 @@ namespace SharpML.Recurrent.Trainer
                 if (reportedLossTrain == 0 && reportedLossValidation == 0)
                 {
                     Console.WriteLine("--------------------------------------------------------------");
-                    Console.WriteLine("\nDONE.");
+                    Console.WriteLine("\nОбучение завершено.");
                     break;
                 }
             }
