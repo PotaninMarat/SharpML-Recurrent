@@ -32,26 +32,26 @@ namespace SharpML.Recurrent.Models
             }
         }
 
-        public Matrix ConcatVectors(Matrix m1, Matrix m2)
+        public NNValue ConcatVectors(NNValue m1, NNValue m2)
         {
-            if (m1.Cols > 1 || m2.Cols > 1)
+            if (m1.W > 1 || m2.W > 1)
             {
                 throw new Exception("Expected column vectors");
             }
-            Matrix returnObj = new Matrix(m1.Rows + m2.Rows);
+            NNValue returnObj = new NNValue(m1.H + m2.H);
 
             int loc = 0;
-            for (int i = 0; i < m1.W.Length; i++)
+            for (int i = 0; i < m1.DataInTensor.Length; i++)
             {
-                returnObj.W[loc] = m1.W[i];
-                returnObj.Dw[loc] = m1.Dw[i];
+                returnObj.DataInTensor[loc] = m1.DataInTensor[i];
+                returnObj.DifData[loc] = m1.DifData[i];
                 returnObj.StepCache[loc] = m1.StepCache[i];
                 loc++;
             }
-            for (int i = 0; i < m2.W.Length; i++)
+            for (int i = 0; i < m2.DataInTensor.Length; i++)
             {
-                returnObj.W[loc] = m2.W[i];
-                returnObj.Dw[loc] = m2.Dw[i];
+                returnObj.DataInTensor[loc] = m2.DataInTensor[i];
+                returnObj.DifData[loc] = m2.DifData[i];
                 returnObj.StepCache[loc] = m2.StepCache[i];
                 loc++;
             }
@@ -61,17 +61,17 @@ namespace SharpML.Recurrent.Models
                 bp.Run = delegate()
                 {
                     int index0 = 0;
-                    for (int i = 0; i < m1.W.Length; i++)
+                    for (int i = 0; i < m1.DataInTensor.Length; i++)
                     {
-                        m1.W[i] = returnObj.W[index0];
-                        m1.Dw[i] = returnObj.Dw[index0];
+                        m1.DataInTensor[i] = returnObj.DataInTensor[index0];
+                        m1.DifData[i] = returnObj.DifData[index0];
                         m1.StepCache[i] = returnObj.StepCache[index0];
                         index0++;
                     }
-                    for (int i = 0; i < m2.W.Length; i++)
+                    for (int i = 0; i < m2.DataInTensor.Length; i++)
                     {
-                        m2.W[i] = returnObj.W[index0];
-                        m2.Dw[i] = returnObj.Dw[index0];
+                        m2.DataInTensor[i] = returnObj.DataInTensor[index0];
+                        m2.DifData[i] = returnObj.DifData[index0];
                         m2.StepCache[i] = returnObj.StepCache[index0];
                         index0++;
                     }
@@ -82,22 +82,22 @@ namespace SharpML.Recurrent.Models
             return returnObj;
         }
 
-        public Matrix Nonlin(INonlinearity neuron, Matrix m)
+        public NNValue Nonlin(INonlinearity neuron, NNValue m)
         {
-            Matrix returnObj = new Matrix(m.Rows, m.Cols);
-            int n = m.W.Length;
-            for (int i = 0; i < n; i++)
-            {
-                returnObj.W[i] = neuron.Forward(m.W[i]);
-            }
+            NNValue returnObj = new NNValue(m.H, m.W);
+            int n = m.DataInTensor.Length;
+            returnObj = neuron.Forward(m);
+
             if (this.ApplyBackprop)
             {
                 Runnable bp = new Runnable();
                 bp.Run = delegate()
                 {
+                    var data = neuron.Backward(m);
+
                     for (int i = 0; i < n; i++)
                     {
-                        m.Dw[i] += neuron.Backward(m.W[i]) * returnObj.Dw[i];
+                        m.DifData[i] += data.DataInTensor[i]* returnObj.DifData[i];
                     }
 
                 };
@@ -106,17 +106,17 @@ namespace SharpML.Recurrent.Models
             return returnObj;
         }
 
-        public Matrix Mul(Matrix m1, Matrix m2)
+        public NNValue Mul(NNValue m1, NNValue m2)
         {
-            if (m1.Cols != m2.Rows)
+            if (m1.W != m2.H)
             {
                 throw new Exception("matrix dimension mismatch");
             }
 
-            int m1Rows = m1.Rows;
-            int m1Cols = m1.Cols;
-            int m2Cols = m2.Cols;
-            Matrix returnObj = new Matrix(m1Rows, m2Cols);
+            int m1Rows = m1.H;
+            int m1Cols = m1.W;
+            int m2Cols = m2.W;
+            NNValue returnObj = new NNValue(m1Rows, m2Cols);
             int outcols = m2Cols;
             for (int i = 0; i < m1Rows; i++)
             {
@@ -126,9 +126,9 @@ namespace SharpML.Recurrent.Models
                     double dot = 0;
                     for (int k = 0; k < m1Cols; k++)
                     {
-                        dot += m1.W[m1Col + k] * m2.W[m2Cols * k + j];
+                        dot += m1.DataInTensor[m1Col + k] * m2.DataInTensor[m2Cols * k + j];
                     }
-                    returnObj.W[outcols * i + j] = dot;
+                    returnObj.DataInTensor[outcols * i + j] = dot;
                 }
             }
             if (this.ApplyBackprop)
@@ -136,16 +136,16 @@ namespace SharpML.Recurrent.Models
                 Runnable bp = new Runnable();
                 bp.Run = delegate()
                 {
-                    for (int i = 0; i < m1.Rows; i++)
+                    for (int i = 0; i < m1.H; i++)
                     {
                         int outcol = outcols * i;
-                        for (int j = 0; j < m2.Cols; j++)
+                        for (int j = 0; j < m2.W; j++)
                         {
-                            double b = returnObj.Dw[outcol + j];
-                            for (int k = 0; k < m1.Cols; k++)
+                            double b = returnObj.DifData[outcol + j];
+                            for (int k = 0; k < m1.W; k++)
                             {
-                                m1.Dw[m1Cols * i + k] += m2.W[m2Cols * k + j] * b;
-                                m2.Dw[m2Cols * k + j] += m1.W[m1Cols * i + k] * b;
+                                m1.DifData[m1Cols * i + k] += m2.DataInTensor[m2Cols * k + j] * b;
+                                m2.DifData[m2Cols * k + j] += m1.DataInTensor[m1Cols * i + k] * b;
                             }
                         }
                     }
@@ -156,26 +156,26 @@ namespace SharpML.Recurrent.Models
             return returnObj;
         }
 
-        public Matrix Add(Matrix m1, Matrix m2)
+        public NNValue Add(NNValue m1, NNValue m2)
         {
-            if (m1.Rows != m2.Rows || m1.Cols != m2.Cols)
+            if (m1.H != m2.H || m1.W != m2.W)
             {
                 throw new Exception("matrix dimension mismatch");
             }
-            Matrix returnObj = new Matrix(m1.Rows, m1.Cols);
-            for (int i = 0; i < m1.W.Length; i++)
+            NNValue returnObj = new NNValue(m1.H, m1.W);
+            for (int i = 0; i < m1.DataInTensor.Length; i++)
             {
-                returnObj.W[i] = m1.W[i] + m2.W[i];
+                returnObj.DataInTensor[i] = m1.DataInTensor[i] + m2.DataInTensor[i];
             }
             if (this.ApplyBackprop)
             {
                 Runnable bp = new Runnable();
                 bp.Run = delegate()
                 {
-                    for (int i = 0; i < m1.W.Length; i++)
+                    for (int i = 0; i < m1.DataInTensor.Length; i++)
                     {
-                        m1.Dw[i] += returnObj.Dw[i];
-                        m2.Dw[i] += returnObj.Dw[i];
+                        m1.DifData[i] += returnObj.DifData[i];
+                        m2.DifData[i] += returnObj.DifData[i];
                     }
                 };
                 Backprop.Add(bp);
@@ -183,56 +183,56 @@ namespace SharpML.Recurrent.Models
             return returnObj;
         }
 
-        public Matrix OneMinus(Matrix m)
+        public NNValue OneMinus(NNValue m)
         {
-            Matrix ones = Matrix.Ones(m.Rows, m.Cols);
+            NNValue ones = NNValue.Ones(m.H, m.W);
             return Subtract(ones, m);
         }
 
-        public Matrix Subtract(Matrix m1, Matrix m2)
+        public NNValue Subtract(NNValue m1, NNValue m2)
         {
             return Add(m1, Neg(m2));
         }
 
-        public Matrix smul(Matrix m, double s)
+        public NNValue smul(NNValue m, double s)
         {
-            Matrix m2 = Matrix.Uniform(m.Rows, m.Cols, s);
+            NNValue m2 = NNValue.Uniform(m.H, m.W, s);
             return Elmul(m, m2);
         }
 
-        public Matrix smul(double s, Matrix m)
+        public NNValue smul(double s, NNValue m)
         {
-            Matrix returnObj = smul(m, s);
+            NNValue returnObj = smul(m, s);
             return returnObj;
         }
 
-        public Matrix Neg(Matrix m)
+        public NNValue Neg(NNValue m)
         {
-            Matrix negones = Matrix.NegativeOnes(m.Rows, m.Cols);
-            Matrix returnObj = Elmul(negones, m);
+            NNValue negones = NNValue.NegativeOnes(m.H, m.W);
+            NNValue returnObj = Elmul(negones, m);
             return returnObj;
         }
 
-        public Matrix Elmul(Matrix m1, Matrix m2)
+        public NNValue Elmul(NNValue m1, NNValue m2)
         {
-            if (m1.Rows != m2.Rows || m1.Cols != m2.Cols)
+            if (m1.H != m2.H || m1.W != m2.W)
             {
                 throw new Exception("matrix dimension mismatch");
             }
-            Matrix returnObj = new Matrix(m1.Rows, m1.Cols);
-            for (int i = 0; i < m1.W.Length; i++)
+            NNValue returnObj = new NNValue(m1.H, m1.W);
+            for (int i = 0; i < m1.DataInTensor.Length; i++)
             {
-                returnObj.W[i] = m1.W[i] * m2.W[i];
+                returnObj.DataInTensor[i] = m1.DataInTensor[i] * m2.DataInTensor[i];
             }
             if (this.ApplyBackprop)
             {
                 Runnable bp = new Runnable();
                 bp.Run = delegate()
                 {
-                    for (int i = 0; i < m1.W.Length; i++)
+                    for (int i = 0; i < m1.DataInTensor.Length; i++)
                     {
-                        m1.Dw[i] += m2.W[i] * returnObj.Dw[i];
-                        m2.Dw[i] += m1.W[i] * returnObj.Dw[i];
+                        m1.DifData[i] += m2.DataInTensor[i] * returnObj.DifData[i];
+                        m2.DifData[i] += m1.DataInTensor[i] * returnObj.DifData[i];
                     }
                 };
                 Backprop.Add(bp);

@@ -8,18 +8,17 @@ namespace SharpML.Recurrent.Networks
     public class NeuralNetwork : INetwork
     {
 
-        private static long _serialVersionUid = 1L;
-        readonly List<ILayer> _layers;
+        public List<ILayer> Layers { get; set; }
 
         public NeuralNetwork(List<ILayer> layers)
         {
-            this._layers = layers;
+            Layers = layers;
         }
 
-        public Matrix Activate(Matrix input, Graph g)
+        public NNValue Activate(NNValue input, Graph g)
         {
-            Matrix prev = input;
-            foreach (ILayer layer in _layers)
+            NNValue prev = input;
+            foreach (ILayer layer in Layers)
             {
                 prev = layer.Activate(prev, g);
             }
@@ -28,16 +27,16 @@ namespace SharpML.Recurrent.Networks
 
         public void ResetState()
         {
-            foreach (ILayer layer in _layers)
+            foreach (ILayer layer in Layers)
             {
                 layer.ResetState();
             }
         }
 
-        public List<Matrix> GetParameters()
+        public List<NNValue> GetParameters()
         {
-            List<Matrix> result = new List<Matrix>();
-            foreach (ILayer layer in _layers)
+            List<NNValue> result = new List<NNValue>();
+            foreach (ILayer layer in Layers)
             {
                 result.AddRange(layer.GetParameters());
             }

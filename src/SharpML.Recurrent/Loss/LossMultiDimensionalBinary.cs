@@ -9,25 +9,25 @@ namespace SharpML.Recurrent.Loss
     public class LossMultiDimensionalBinary : ILoss
     {
 
-        public void Backward(Matrix actualOutput, Matrix targetOutput)
+        public void Backward(NNValue actualOutput, NNValue targetOutput)
         {
             throw new NotImplementedException("not implemented");
         }
 
-        public double Measure(Matrix actualOutput, Matrix targetOutput)
+        public double Measure(NNValue actualOutput, NNValue targetOutput)
         {
-            if (actualOutput.W.Length != targetOutput.W.Length)
+            if (actualOutput.DataInTensor.Length != targetOutput.DataInTensor.Length)
             {
                 throw new Exception("mismatch");
             }
 
-            for (int i = 0; i < targetOutput.W.Length; i++)
+            for (int i = 0; i < targetOutput.DataInTensor.Length; i++)
             {
-                if (targetOutput.W[i] >= 0.5 && actualOutput.W[i] < 0.5)
+                if (targetOutput.DataInTensor[i] >= 0.5 && actualOutput.DataInTensor[i] < 0.5)
                 {
                     return 1;
                 }
-                if (targetOutput.W[i] < 0.5 && actualOutput.W[i] >= 0.5)
+                if (targetOutput.DataInTensor[i] < 0.5 && actualOutput.DataInTensor[i] >= 0.5)
                 {
                     return 1;
                 }

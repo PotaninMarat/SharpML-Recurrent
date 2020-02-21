@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpML.Recurrent.Models;
+using System;
 
 namespace SharpML.Recurrent.Activations
 {
@@ -26,6 +27,32 @@ namespace SharpML.Recurrent.Activations
         public double Backward(double x)
         {
             return Math.Cos(x);
+        }
+
+        public NNValue Forward(NNValue x)
+        {
+            NNValue valueMatrix = new NNValue(x.H, x.W);
+            int len = x.DataInTensor.Length;
+
+            for (int i = 0; i < len; i++)
+            {
+                valueMatrix.DataInTensor[i] = Forward(x.DataInTensor[i]);
+            }
+
+            return valueMatrix;
+        }
+
+        public NNValue Backward(NNValue x)
+        {
+            NNValue valueMatrix = new NNValue(x.H, x.W);
+            int len = x.DataInTensor.Length;
+
+            for (int i = 0; i < len; i++)
+            {
+                valueMatrix.DataInTensor[i] = Backward(x.DataInTensor[i]);
+            }
+
+            return valueMatrix;
         }
     }
 }

@@ -12,17 +12,17 @@ namespace SharpML.Recurrent.Networks
 	int _inputDimension;
          readonly int _outputDimension;
 
-         readonly Matrix _hmix;
-         readonly Matrix _hHmix;
-         readonly Matrix _bmix;
-         readonly Matrix _hnew;
-         readonly Matrix _hHnew;
-         readonly Matrix _bnew;
-         readonly Matrix _hreset;
-         readonly Matrix _hHreset;
-         readonly Matrix _breset;
+         readonly NNValue _hmix;
+         readonly NNValue _hHmix;
+         readonly NNValue _bmix;
+         readonly NNValue _hnew;
+         readonly NNValue _hHnew;
+         readonly NNValue _bnew;
+         readonly NNValue _hreset;
+         readonly NNValue _hHreset;
+         readonly NNValue _breset;
 
-         Matrix _context;
+         NNValue _context;
 
          readonly INonlinearity _fMix = new SigmoidUnit();
          readonly INonlinearity _fReset = new SigmoidUnit();
@@ -31,35 +31,35 @@ namespace SharpML.Recurrent.Networks
 	public GruLayer(int inputDimension, int outputDimension, double initParamsStdDev, Random rng) {
 		this._inputDimension = inputDimension;
 		this._outputDimension = outputDimension;
-		_hmix = Matrix.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-		_hHmix = Matrix.Random(outputDimension, outputDimension, initParamsStdDev, rng);
-		_bmix = new Matrix(outputDimension);
-		_hnew = Matrix.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-		_hHnew = Matrix.Random(outputDimension, outputDimension, initParamsStdDev, rng);
-		_bnew = new Matrix(outputDimension);
-		_hreset = Matrix.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-		_hHreset = Matrix.Random(outputDimension, outputDimension, initParamsStdDev, rng);
-		_breset= new Matrix(outputDimension);
+		_hmix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+		_hHmix = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+		_bmix = new NNValue(outputDimension);
+		_hnew = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+		_hHnew = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+		_bnew = new NNValue(outputDimension);
+		_hreset = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+		_hHreset = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+		_breset= new NNValue(outputDimension);
 	}
 	
-	public Matrix Activate(Matrix input, Graph g)  {
+	public NNValue Activate(NNValue input, Graph g)  {
 		
-		Matrix sum0 = g.Mul(_hmix, input);
-		Matrix sum1 = g.Mul(_hHmix, _context);
-		Matrix actMix = g.Nonlin(_fMix, g.Add(g.Add(sum0, sum1), _bmix));
+		NNValue sum0 = g.Mul(_hmix, input);
+		NNValue sum1 = g.Mul(_hHmix, _context);
+		NNValue actMix = g.Nonlin(_fMix, g.Add(g.Add(sum0, sum1), _bmix));
 
-		Matrix sum2 = g.Mul(_hreset, input);
-		Matrix sum3 = g.Mul(_hHreset, _context);
-		Matrix actReset = g.Nonlin(_fReset, g.Add(g.Add(sum2, sum3), _breset));
+		NNValue sum2 = g.Mul(_hreset, input);
+		NNValue sum3 = g.Mul(_hHreset, _context);
+		NNValue actReset = g.Nonlin(_fReset, g.Add(g.Add(sum2, sum3), _breset));
 		
-		Matrix sum4 = g.Mul(_hnew, input);
-		Matrix gatedContext = g.Elmul(actReset, _context);
-		Matrix sum5 = g.Mul(_hHnew, gatedContext);
-		Matrix actNewPlusGatedContext = g.Nonlin(_fNew, g.Add(g.Add(sum4, sum5), _bnew));
+		NNValue sum4 = g.Mul(_hnew, input);
+		NNValue gatedContext = g.Elmul(actReset, _context);
+		NNValue sum5 = g.Mul(_hHnew, gatedContext);
+		NNValue actNewPlusGatedContext = g.Nonlin(_fNew, g.Add(g.Add(sum4, sum5), _bnew));
 		
-		Matrix memvals = g.Elmul(actMix, _context);
-		Matrix newvals = g.Elmul(g.OneMinus(actMix), actNewPlusGatedContext);
-		Matrix output = g.Add(memvals, newvals);
+		NNValue memvals = g.Elmul(actMix, _context);
+		NNValue newvals = g.Elmul(g.OneMinus(actMix), actNewPlusGatedContext);
+		NNValue output = g.Add(memvals, newvals);
 		
 		//rollover activations for next iteration
 		_context = output;
@@ -68,11 +68,11 @@ namespace SharpML.Recurrent.Networks
 	}
 
 	public void ResetState() {
-		_context = new Matrix(_outputDimension);
+		_context = new NNValue(_outputDimension);
 	}
 
-	public List<Matrix> GetParameters() {
-		List<Matrix> result = new List<Matrix>();
+	public List<NNValue> GetParameters() {
+		List<NNValue> result = new List<NNValue>();
 		result.Add(_hmix);
         result.Add(_hHmix);
         result.Add(_bmix);

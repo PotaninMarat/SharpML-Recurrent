@@ -8,30 +8,37 @@ namespace SharpML.Recurrent.DataStructs
 {
     public class DataStep {
 
-	public Matrix Input = null;
-	public Matrix TargetOutput = null;
+	public NNValue Input = null;
+	public NNValue TargetOutput = null;
 	
 	public DataStep() {
 		
 	}
-	
-	public DataStep(double[] input, double[] targetOutput) {
-		this.Input = new Matrix(input);
-		if (targetOutput != null) {
-			this.TargetOutput = new Matrix(targetOutput);
-		}
-	}
-	
-	public override string ToString() {
+
+        public DataStep(double[] input, double[] targetOutput)
+        {
+            this.Input = new NNValue(input);
+            if (targetOutput != null)
+            {
+                this.TargetOutput = new NNValue(targetOutput);
+            }
+        }
+
+        public DataStep(double[] input)
+        {
+            this.Input = new NNValue(input);
+        }
+
+        public override string ToString() {
 		String result = "";
-		for (int i = 0; i < Input.W.Length; i++) {
-            result += String.Format("{0:N5}", Input.W[i]) + "\t";
+		for (int i = 0; i < Input.DataInTensor.Length; i++) {
+            result += String.Format("{0:N5}", Input.DataInTensor[i]) + "\t";
 		}
 		result += "\t->\t";
 		if (TargetOutput != null) {
-            for (int i = 0; i < TargetOutput.W.Length; i++)
+            for (int i = 0; i < TargetOutput.DataInTensor.Length; i++)
             {
-                result += String.Format("{0:N5}", TargetOutput.W[i]) + "\t";
+                result += String.Format("{0:N5}", TargetOutput.DataInTensor[i]) + "\t";
 			}
 		}
 		else {

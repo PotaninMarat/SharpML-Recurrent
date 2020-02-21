@@ -1,7 +1,10 @@
-﻿namespace SharpML.Recurrent.Activations
+﻿using SharpML.Recurrent.Models;
+
+namespace SharpML.Recurrent.Activations
 {
-    public interface INonlinearity  {
-	double Forward(double x);
-	double Backward(double x);
-}
+    public interface INonlinearity
+    {
+	NNValue Forward(NNValue x);
+    NNValue Backward(NNValue x);
+    }
 }

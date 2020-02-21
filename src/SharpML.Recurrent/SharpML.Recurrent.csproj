@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activations\Abs.cs" />
+    <Compile Include="Activations\SoftmaxUnit.cs" />
+    <Compile Include="Loss\CrossEntropyWithSoftmax.cs" />
     <Compile Include="Loss\LossCrossEntropy.cs" />
     <Compile Include="DataStructs\DataSequence.cs" />
     <Compile Include="DataStructs\DataSet.cs" />
@@ -65,11 +68,12 @@
     <Compile Include="Networks\ILayer.cs" />
     <Compile Include="Models\Runnable.cs" />
     <Compile Include="Models\IRunnable.cs" />
-    <Compile Include="Models\Matrix.cs" />
+    <Compile Include="Models\NNValueMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Trainer\Trainer.cs" />
     <Compile Include="Util\Binary.cs" />
     <Compile Include="Util\NetworkBuilder.cs" />
+    <Compile Include="Util\Saver.cs" />
     <Compile Include="Util\Util.cs" />
   </ItemGroup>
   <ItemGroup>

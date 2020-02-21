@@ -9,15 +9,15 @@ namespace SharpML.Recurrent.Loss
     public class LossArgMax : ILoss
     {
 
-        public void Backward(Matrix actualOutput, Matrix targetOutput)
+        public void Backward(NNValue actualOutput, NNValue targetOutput)
         {
             throw new Exception("not implemented");
 
         }
 
-        public double Measure(Matrix actualOutput, Matrix targetOutput)
+        public double Measure(NNValue actualOutput, NNValue targetOutput)
         {
-            if (actualOutput.W.Length != targetOutput.W.Length)
+            if (actualOutput.DataInTensor.Length != targetOutput.DataInTensor.Length)
             {
                 throw new Exception("mismatch");
             }
@@ -25,16 +25,16 @@ namespace SharpML.Recurrent.Loss
             double maxTarget = Double.NegativeInfinity;
             int indxMaxActual = -1;
             int indxMaxTarget = -1;
-            for (int i = 0; i < actualOutput.W.Length; i++)
+            for (int i = 0; i < actualOutput.DataInTensor.Length; i++)
             {
-                if (actualOutput.W[i] > maxActual)
+                if (actualOutput.DataInTensor[i] > maxActual)
                 {
-                    maxActual = actualOutput.W[i];
+                    maxActual = actualOutput.DataInTensor[i];
                     indxMaxActual = i;
                 }
-                if (targetOutput.W[i] > maxTarget)
+                if (targetOutput.DataInTensor[i] > maxTarget)
                 {
-                    maxTarget = targetOutput.W[i];
+                    maxTarget = targetOutput.DataInTensor[i];
                     indxMaxTarget = i;
                 }
             }

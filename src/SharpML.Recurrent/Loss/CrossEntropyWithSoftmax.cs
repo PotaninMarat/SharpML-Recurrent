@@ -1,12 +1,12 @@
-﻿using System;
+﻿using SharpML.Recurrent.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SharpML.Recurrent.Models;
 
 namespace SharpML.Recurrent.Loss
 {
-    public class LossSumOfSquares : ILoss
+    public class CrossEntropyWithSoftmax : ILoss
     {
 
         public void Backward(NNValue actualOutput, NNValue targetOutput)
@@ -20,13 +20,20 @@ namespace SharpML.Recurrent.Loss
 
         public double Measure(NNValue actualOutput, NNValue targetOutput)
         {
-            double sum = 0;
-            for (int i = 0; i < targetOutput.DataInTensor.Length; i++)
+            var crossentropy = 0.0;
+
+            for (int i = 0; i < actualOutput.DataInTensor.Length; i++)
             {
-                double errDelta = actualOutput.DataInTensor[i] - targetOutput.DataInTensor[i];
-                sum += 0.5 * errDelta * errDelta;
+                crossentropy += targetOutput.DataInTensor[i] * Math.Log(actualOutput.DataInTensor[i] + 1e-15);
             }
-            return sum;
+
+            if (double.IsNaN(crossentropy))
+            {
+                int q = 1;
+            }
+
+            return -crossentropy;
         }
     }
 }
+

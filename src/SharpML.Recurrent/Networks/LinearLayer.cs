@@ -9,17 +9,17 @@ namespace SharpML.Recurrent.Networks
     {
 
         private static long _serialVersionUid = 1L;
-         readonly Matrix _w;
+         readonly NNValue _w;
         //no biases
 
         public LinearLayer(int inputDimension, int outputDimension, double initParamsStdDev, Random rng)
         {
-            _w = Matrix.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _w = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
         }
 
-        public Matrix Activate(Matrix input, Graph g)
+        public NNValue Activate(NNValue input, Graph g)
         {
-            Matrix returnObj = g.Mul(_w, input);
+            NNValue returnObj = g.Mul(_w, input);
             return returnObj;
         }
 
@@ -28,9 +28,9 @@ namespace SharpML.Recurrent.Networks
 
         }
 
-        public List<Matrix> GetParameters()
+        public List<NNValue> GetParameters()
         {
-            List<Matrix> result = new List<Matrix>();
+            List<NNValue> result = new List<NNValue>();
             result.Add(_w);
             return result;
         }

@@ -61,7 +61,11 @@ namespace SharpML.Recurrent.Util
                     layers.Add(new FeedForwardLayer(hiddenDimension, hiddenDimension, hiddenUnit, initParamsStdDev, rng));
                 }
             }
+            if(hiddenLayers == 0)
+                layers.Add(new FeedForwardLayer(inputDimension, outputDimension, decoderUnit, initParamsStdDev, rng));
+            else
             layers.Add(new FeedForwardLayer(hiddenDimension, outputDimension, decoderUnit, initParamsStdDev, rng));
+
             return new NeuralNetwork(layers);
         }
 

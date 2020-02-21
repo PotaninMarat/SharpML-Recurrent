@@ -5,8 +5,8 @@ namespace SharpML.Recurrent.Networks
 {
     public interface ILayer 
     {
-        Matrix Activate(Matrix input, Graph g);
+        NNValue Activate(NNValue input, Graph g);
         void ResetState();
-        List<Matrix> GetParameters();
+        List<NNValue> GetParameters();
     }
 }

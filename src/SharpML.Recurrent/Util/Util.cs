@@ -9,17 +9,17 @@ namespace SharpML.Recurrent.Util
     public class Util
     {
 
-        public static int PickIndexFromRandomVector(Matrix probs, Random r)
+        public static int PickIndexFromRandomVector(NNValue probs, Random r)
         {
             double mass = 1.0;
-            for (int i = 0; i < probs.W.Length; i++)
+            for (int i = 0; i < probs.DataInTensor.Length; i++)
             {
-                double prob = probs.W[i] / mass;
+                double prob = probs.DataInTensor[i] / mass;
                 if (r.NextDouble() < prob)
                 {
                     return i;
                 }
-                mass -= probs.W[i];
+                mass -= probs.DataInTensor[i];
             }
             throw new Exception("no target index selected");
         }
