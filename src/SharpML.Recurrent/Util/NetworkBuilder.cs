@@ -1,11 +1,11 @@
-﻿using System;
+﻿using SharpML.Activations;
+using SharpML.Networks;
+using SharpML.Networks.Base;
+using SharpML.Networks.Recurrent;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SharpML.Recurrent.Activations;
-using SharpML.Recurrent.Networks;
 
-namespace SharpML.Recurrent.Util
+namespace SharpML.Util
 {
     public static class NetworkBuilder
     {

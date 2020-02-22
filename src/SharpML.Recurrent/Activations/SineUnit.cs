@@ -1,7 +1,7 @@
-﻿using SharpML.Recurrent.Models;
+﻿using SharpML.Models;
 using System;
 
-namespace SharpML.Recurrent.Activations
+namespace SharpML.Activations
 {
     [Serializable]
     public class SineUnit : INonlinearity

@@ -1,12 +1,8 @@
-﻿using System;
+﻿using SharpML.Activations;
+using SharpML.Loss;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SharpML.Recurrent.Activations;
-using SharpML.Recurrent.Loss;
-using SharpML.Recurrent.Networks;
 
-namespace SharpML.Recurrent.DataStructs
+namespace SharpML.DataStructs
 {
     public abstract class DataSet 
     {

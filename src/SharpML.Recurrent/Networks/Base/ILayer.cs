@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using SharpML.Recurrent.Models;
+using SharpML.Models;
 
-namespace SharpML.Recurrent.Networks
+namespace SharpML.Networks.Base
 {
     public interface ILayer 
     {
-        NNValue Activate(NNValue input, Graph g);
+        NNValue Activate(NNValue input, IGraph g);
         void ResetState();
         List<NNValue> GetParameters();
     }

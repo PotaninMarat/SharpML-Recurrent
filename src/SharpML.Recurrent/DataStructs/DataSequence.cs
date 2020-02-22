@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SharpML.Recurrent.DataStructs
+namespace SharpML.DataStructs
 {
     public class DataSequence
     {
@@ -11,7 +9,7 @@ namespace SharpML.Recurrent.DataStructs
 
         public DataSequence()
         {
-
+            Steps = new List<DataStep>();
         }
 
         public DataSequence(List<DataStep> steps)

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using SharpML.Recurrent.Activations;
-using SharpML.Recurrent.Models;
+using SharpML.Networks.Base;
+using SharpML.Activations;
+using SharpML.Models;
 
-namespace SharpML.Recurrent.Networks
+namespace SharpML.Networks.Recurrent
 {
      [Serializable]
     public class RnnLayer : ILayer
@@ -31,7 +32,7 @@ namespace SharpML.Recurrent.Networks
             ResetState();
         }
 
-        public NNValue Activate(NNValue input, Graph g)
+        public NNValue Activate(NNValue input, IGraph g)
         {
             NNValue concat = g.ConcatVectors(input, _context);
             NNValue sum = g.Mul(_w, concat); sum = g.Add(sum, _b);

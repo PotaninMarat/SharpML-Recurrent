@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using SharpML.Recurrent.Models;
+using SharpML.Models;
 
-namespace SharpML.Recurrent.Util
+namespace SharpML.Util
 {
     public class Util
     {

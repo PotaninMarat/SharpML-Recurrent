@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using SharpML.Recurrent.Models;
+using SharpML.Models;
+using SharpML.Networks.Base;
 
-namespace SharpML.Recurrent.Networks
+namespace SharpML.Networks
 {
      [Serializable]
     public class LinearLayer : ILayer
@@ -17,7 +18,7 @@ namespace SharpML.Recurrent.Networks
             _w = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
         }
 
-        public NNValue Activate(NNValue input, Graph g)
+        public NNValue Activate(NNValue input, IGraph g)
         {
             NNValue returnObj = g.Mul(_w, input);
             return returnObj;

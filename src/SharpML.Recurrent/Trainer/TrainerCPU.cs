@@ -1,25 +1,20 @@
-﻿using System;
+﻿using SharpML.DataStructs;
+using SharpML.Loss;
+using SharpML.Models;
+using SharpML.Networks.Base;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using SharpML.Recurrent;
-using SharpML.Recurrent.DataStructs;
-using SharpML.Recurrent.Loss;
-using SharpML.Recurrent.Models;
-using SharpML.Recurrent.Networks;
-using SharpML.Recurrent.Util;
 using System.Threading.Tasks;
 
-namespace SharpML.Recurrent.Trainer
+namespace SharpML.Trainer
 {
-    public class Trainer
+    public class TrainerCPU : ITrainer
     {
 
-        public static double DecayRate = 0.999;
-        public static double SmoothEpsilon = 1e-8;
-        public static double GradientClipValue = 5;
-        public static double Regularization = 0.000001; // L2 regularization strength
+        public double DecayRate = 0.999;
+        public double SmoothEpsilon = 1e-8;
+        public double GradientClipValue = 5;
+        public double Regularization = 0.000001; // L2 regularization strength
 
 
         /// <summary>
@@ -33,7 +28,7 @@ namespace SharpML.Recurrent.Trainer
         /// <param name="reportEveryNthEpoch">Как часто выводить данные в консоль</param>
         /// <param name="rng">Датчик случайных чисел</param>
         /// <returns>Ошибка</returns>
-        public static List<double>[] train(int trainingEpochs, double learningRate, INetwork network, DataSet data, int reportEveryNthEpoch, double minLoss)
+        public List<double>[] Train(int trainingEpochs, double learningRate, INetwork network, DataSet data, int reportEveryNthEpoch, double minLoss)
         {
             Console.WriteLine("--------------------------------------------------------------");
             List<double>[] result = new List<double>[3];
@@ -104,7 +99,7 @@ namespace SharpML.Recurrent.Trainer
         /// <param name="reportEveryNthEpoch">Как часто выводить данные в консоль</param>
         /// <param name="rng">Датчик случайных чисел</param>
         /// <returns>Ошибка</returns>
-        public static List<double>[] trainWithoutConsole(int trainingEpochs, double learningRate, INetwork network, DataSet data, int reportEveryNthEpoch, double minLoss)
+        public List<double>[] TrainWithoutConsole(int trainingEpochs, double learningRate, INetwork network, DataSet data, int reportEveryNthEpoch, double minLoss)
         {
             List<double>[] result = new List<double>[3];
 
@@ -138,17 +133,16 @@ namespace SharpML.Recurrent.Trainer
 
 
 
-        public static double Pass(double learningRate, INetwork network, List<DataSequence> sequences,
+        public double Pass(double learningRate, INetwork network, List<DataSequence> sequences,
             bool applyTraining, ILoss lossTraining)
         {
             double numerLoss = 0;
             double denomLoss = 0;
 
-
             foreach (DataSequence seq in sequences)
             {
                 network.ResetState();
-                Graph g = new Graph(applyTraining);
+                GraphCPU g = new GraphCPU(applyTraining);
                 foreach (DataStep step in seq.Steps)
                 {
                     NNValue output = network.Activate(step.Input, g);
@@ -179,10 +173,9 @@ namespace SharpML.Recurrent.Trainer
         }
 
 
-        public static void UpdateModelParams(INetwork network, double stepSize)
+        public void UpdateModelParams(INetwork network, double stepSize)
         {
-            //foreach (NNValueMatrix m in network.GetParameters())
-
+            
                 Parallel.ForEach(network.GetParameters(), new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount} , m =>
                 {
                     for (int i = 0; i < m.DataInTensor.Length; i++)

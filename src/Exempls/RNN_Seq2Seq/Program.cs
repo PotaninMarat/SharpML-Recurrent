@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpML.Recurrent;
-using SharpML.Recurrent.Activations;
-using SharpML.Recurrent.Loss;
-using SharpML.Recurrent.Trainer;
-using SharpML.Recurrent.Models;
-using SharpML.Recurrent.Networks;
-using SharpML.Recurrent.Util;
-using SharpML.Recurrent.DataStructs;
+using SharpML.Activations;
+using SharpML.Loss;
+using SharpML.Trainer;
+using SharpML.Models;
+using SharpML.Util;
+using SharpML.DataStructs;
+using SharpML.Networks.Base;
 
 namespace RNN_Seq2Seq
 {

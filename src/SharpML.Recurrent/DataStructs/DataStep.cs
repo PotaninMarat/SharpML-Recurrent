@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SharpML.Recurrent.Models;
+﻿using SharpML.Models;
+using System;
 
-namespace SharpML.Recurrent.DataStructs
+namespace SharpML.DataStructs
 {
     public class DataStep {
 
@@ -17,16 +14,28 @@ namespace SharpML.Recurrent.DataStructs
 
         public DataStep(double[] input, double[] targetOutput)
         {
-            this.Input = new NNValue(input);
+            Input = new NNValue(input);
             if (targetOutput != null)
             {
-                this.TargetOutput = new NNValue(targetOutput);
+               TargetOutput = new NNValue(targetOutput);
             }
         }
 
         public DataStep(double[] input)
         {
-            this.Input = new NNValue(input);
+            Input = new NNValue(input);
+        }
+
+
+        public DataStep(NNValue input, NNValue targetOutput)
+        {
+            Input = input.Clone();
+            TargetOutput = targetOutput.Clone();
+        }
+
+        public DataStep(NNValue input)
+        {
+            Input = input.Clone();
         }
 
         public override string ToString() {

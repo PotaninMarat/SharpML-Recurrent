@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using SharpML.Recurrent.Models;
+using SharpML.Networks.Base;
+using SharpML.Models;
 
-namespace SharpML.Recurrent.Networks
+namespace SharpML.Networks
 {
     [Serializable]
     public class NeuralNetwork : INetwork
@@ -15,7 +16,7 @@ namespace SharpML.Recurrent.Networks
             Layers = layers;
         }
 
-        public NNValue Activate(NNValue input, Graph g)
+        public NNValue Activate(NNValue input, IGraph g)
         {
             NNValue prev = input;
             foreach (ILayer layer in Layers)

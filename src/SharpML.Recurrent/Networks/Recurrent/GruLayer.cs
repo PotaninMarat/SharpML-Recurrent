@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using SharpML.Recurrent.Activations;
-using SharpML.Recurrent.Models;
+using SharpML.Activations;
+using SharpML.Models;
+using SharpML.Networks.Base;
 
-namespace SharpML.Recurrent.Networks
+namespace SharpML.Networks.Recurrent
 {
      [Serializable]
     public class GruLayer : ILayer {
@@ -42,7 +43,7 @@ namespace SharpML.Recurrent.Networks
 		_breset= new NNValue(outputDimension);
 	}
 	
-	public NNValue Activate(NNValue input, Graph g)  {
+	public NNValue Activate(NNValue input, IGraph g)  {
 		
 		NNValue sum0 = g.Mul(_hmix, input);
 		NNValue sum1 = g.Mul(_hHmix, _context);

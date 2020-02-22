@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace SharpML.Recurrent.Models
+namespace SharpML.Models
 {
     [Serializable]
     public class NNValue
@@ -35,6 +35,42 @@ namespace SharpML.Recurrent.Models
         /// Кэш
         /// </summary>
         public double[] StepCache;
+
+        public double this[int i]
+        {
+            get
+            {
+                return DataInTensor[i];
+            }
+            set
+            {
+                DataInTensor[i] = value;
+            }
+        }
+
+        public double this[int h, int w]
+        {
+            get
+            {
+                return GetW(h, w);
+            }
+            set
+            {
+                SetW(h, w, value);
+            }
+        }
+
+        public double this[int h, int w, int d]
+        {
+            get
+            {
+                return GetW(h, w, d);
+            }
+            set
+            {
+                SetW(h, w, d, value);
+            }
+        }
 
         int _s;
 
@@ -120,7 +156,7 @@ namespace SharpML.Recurrent.Models
 
         public NNValue Clone()
         {
-            NNValue result = new NNValue(H, W);
+            NNValue result = new NNValue(H, W, D);
             for (int i = 0; i < DataInTensor.Length; i++)
             {
                 result.DataInTensor[i] = DataInTensor[i];
@@ -158,7 +194,6 @@ namespace SharpML.Recurrent.Models
             }
             return result;
         }
-
 
         /// <summary>
         /// Заполнение тензора случайными числами

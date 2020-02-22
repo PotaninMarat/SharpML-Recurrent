@@ -1,7 +1,7 @@
 ﻿using System;
-using SharpML.Recurrent.Models;
+using SharpML.Models;
 
-namespace SharpML.Recurrent.Activations
+namespace SharpML.Activations
 {
     public class SoftmaxUnit : INonlinearity
     {

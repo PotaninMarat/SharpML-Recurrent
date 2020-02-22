@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E8B13951-9832-423B-993B-214EDC37357A}</ProjectGuid>
+    <ProjectGuid>{8FE6236A-52E4-4552-981D-4A5CECEF61E1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>RNN_Seq2Seq</RootNamespace>
-    <AssemblyName>RNN_Seq2Seq</AssemblyName>
+    <RootNamespace>CnnTest</RootNamespace>
+    <AssemblyName>CnnTest</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

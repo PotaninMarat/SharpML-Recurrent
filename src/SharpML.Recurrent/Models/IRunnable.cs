@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SharpML.Recurrent.Models
+namespace SharpML.Models
 {
     public interface IRunnable
     {
