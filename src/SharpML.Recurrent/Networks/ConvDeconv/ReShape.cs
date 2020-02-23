@@ -1,6 +1,5 @@
 ﻿using SharpML.DataStructs;
 using SharpML.Models;
-using SharpML.Networks.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,22 +7,22 @@ using System.Text;
 
 namespace SharpML.Networks.ConvDeconv
 {
-    public class Flatten : ILayer
+    public class ReShape
     {
         float _gain = 1.0f;
+        Shape shape;
 
-        public Flatten() { }
+        public ReShape() { }
 
-        public Flatten(float gain)
+        public ReShape(Shape newShape, float gain = 1.0f)
         {
+            shape = newShape;
             _gain = gain;
         }
 
         public NNValue Activate(NNValue input, IGraph g)
         {
-            Shape shape = new Shape(input.Len);
             return g.ReShape(input, shape, _gain);
-
         }
 
         public List<NNValue> GetParameters()

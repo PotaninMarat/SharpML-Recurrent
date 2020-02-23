@@ -1,4 +1,5 @@
 ﻿using SharpML.Activations;
+using SharpML.DataStructs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,5 +44,14 @@ namespace SharpML.Models
         NNValue Convolution(NNValue input, NNValue[] filters, bool isSame);
 
         NNValue MaxPooling(NNValue inp, int h, int w);
+
+        /// <summary>
+        /// Преобразование размерности тензора
+        /// </summary>
+        /// <param name="input">Тензор</param>
+        /// <param name="newShape">Новая размерность</param>
+        /// <param name="gain">Усиление градиента</param>
+        /// <returns></returns>
+        NNValue ReShape(NNValue input, Shape newShape, float gain);
     }
 }

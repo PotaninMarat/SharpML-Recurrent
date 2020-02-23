@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SharpML.Activations;
+using SharpML.DataStructs;
 
 namespace SharpML.Models
 {
@@ -447,5 +448,48 @@ namespace SharpML.Models
 
         }
 
+        /// <summary>
+        /// Преобразование размерности тензора
+        /// </summary>
+        /// <param name="input">Тензор</param>
+        /// <param name="newShape">Новая размерность</param>
+        /// <param name="gain">Усиление градиента</param>
+        /// <returns></returns>
+        public NNValue ReShape(NNValue input, Shape newShape, float gain)
+        {
+            NNValue outp = input.Clone();
+
+            outp.H = newShape.H;
+            outp.W = newShape.W;
+            outp.D = newShape.D;
+
+            // Обратный проход
+            if (this.ApplyBackprop)
+            {
+
+                Runnable bp = new Runnable();
+                bp.Run = delegate ()
+                {
+                    if (gain == 1.0)
+                    {
+                        for (int i = 0; i < input.Len; i++)
+                        {
+                            input.DifData[i] = outp.DifData[i];
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < input.Len; i++)
+                        {
+                            input.DifData[i] = gain*outp.DifData[i];
+                        }
+                    }
+                };
+                Backprop.Add(bp);
+            }
+
+
+            return outp;
+        }
     }
 }

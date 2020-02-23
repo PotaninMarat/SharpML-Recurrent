@@ -39,9 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activations\Abs.cs" />
+    <Compile Include="Activations\AbsUnit.cs" />
+    <Compile Include="Activations\ArcTanUnit.cs" />
+    <Compile Include="Activations\EliotSigUnit.cs" />
+    <Compile Include="Activations\GaussianRbfUnit.cs" />
+    <Compile Include="Activations\MaxOutUnit.cs" />
     <Compile Include="Activations\SoftmaxUnit.cs" />
+    <Compile Include="Activations\SqnlUnit.cs" />
+    <Compile Include="Activations\SQRBFUnit.cs" />
     <Compile Include="DataStructs\DataSets\DataSetNoReccurent.cs" />
+    <Compile Include="DataStructs\Shape.cs" />
     <Compile Include="Loss\CrossEntropyWithSoftmax.cs" />
     <Compile Include="Loss\LossCrossEntropy.cs" />
     <Compile Include="DataStructs\DataSequence.cs" />
@@ -61,6 +68,7 @@
     <Compile Include="Networks\Base\INetwork.cs" />
     <Compile Include="Networks\ConvDeconv\Flatten.cs" />
     <Compile Include="Networks\ConvDeconv\MaxPooling.cs" />
+    <Compile Include="Networks\ConvDeconv\ReShape.cs" />
     <Compile Include="Networks\Recurrent\RnnLayer.cs" />
     <Compile Include="Activations\RectifiedLinearUnit.cs" />
     <Compile Include="Networks\NeuralNetwork.cs" />

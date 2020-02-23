@@ -30,7 +30,7 @@ namespace SharpML.Activations
 
         public NNValue Forward(NNValue x)
         {
-            NNValue valueMatrix = new NNValue(x.H, x.W);
+            NNValue valueMatrix = new NNValue(x.H, x.W, x.D);
             int len = x.DataInTensor.Length;
 
             for (int i = 0; i < len; i++)
@@ -43,7 +43,7 @@ namespace SharpML.Activations
 
         public NNValue Backward(NNValue x)
         {
-            NNValue valueMatrix = new NNValue(x.H, x.W);
+            NNValue valueMatrix = new NNValue(x.H, x.W, x.D);
             int len = x.DataInTensor.Length;
 
             for (int i = 0; i < len; i++)

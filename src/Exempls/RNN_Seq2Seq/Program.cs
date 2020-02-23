@@ -73,6 +73,7 @@ namespace RNN_Seq2Seq
     {
         INetwork network;
         Random random = new Random(10);
+        TrainerCPU trainer = new TrainerCPU();
 
 
         public Seq2Seq()
@@ -83,15 +84,15 @@ namespace RNN_Seq2Seq
 
         public void Train(List<int[]> inp, List<int[]> outp)
         {
-            Trainer.Regularization = 1e-7;
-            Trainer.train(30, 0.002, network, new DataSetSeq2Seq(inp, outp), 2, 0.0001);
+            trainer.Regularization = 1e-7;
+            trainer.Train(30, 0.002, network, new DataSetSeq2Seq(inp, outp), 2, 0.0001);
             Console.WriteLine();
             Console.WriteLine();
         }
 
         public void Forward(int[] inp)
         {
-            Graph graph = new Graph(false);
+            GraphCPU graph = new GraphCPU(false);
 
             int indOld = -1;
 
