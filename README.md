@@ -11,7 +11,7 @@
 
 * RnnLayer (Простой рекуррентный слой)
 * LstmLayer
-* RnnLayer
+* GruLayer
 * FeedForwardLayer
 * ConvolutionLayer
 * MaxPooling
