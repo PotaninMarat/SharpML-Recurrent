@@ -1,4 +1,5 @@
-﻿using SharpML.Models;
+﻿using SharpML.DataStructs;
+using SharpML.Models;
 using SharpML.Networks.Base;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,24 @@ namespace SharpML.Networks.ConvDeconv
     public class MaxPooling : ILayer
     {
 
+        public Shape InputShape { get; set; }
+        public Shape OutputShape { get; private set; }
         int _h, _w;
 
-        public MaxPooling(int h =2, int w =2)
+        public MaxPooling(Shape inputShape, int h =2, int w =2)
+        {
+            OutputShape = new Shape(inputShape.H / h, inputShape.W / w, inputShape.D);
+            InputShape = inputShape;
+            _h = h;
+            _w = w;
+        }
+
+        public MaxPooling(int h = 2, int w = 2)
         {
             _h = h;
             _w = w;
         }
+
 
         public NNValue Activate(NNValue input, IGraph g)
         {
@@ -32,6 +44,19 @@ namespace SharpML.Networks.ConvDeconv
         public void ResetState()
         {
 
+        }
+
+        public void Generate(Shape inpShape, Random random, double std)
+        {
+            Init(inpShape, _h, _w);
+        }
+
+        void Init(Shape inputShape, int h = 2, int w = 2)
+        {
+            OutputShape = new Shape(inputShape.H / h, inputShape.W / w, inputShape.D);
+            InputShape = inputShape;
+            _h = h;
+            _w = w;
         }
     }
 }

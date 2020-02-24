@@ -40,7 +40,7 @@ namespace SharpML.Trainer
 
             for (int epoch = 0; epoch < trainingEpochs; epoch++)
             {
-                double reportedLossTrain = Pass(learningRate, network, data.Training, true, data.LossTraining);
+                double reportedLossTrain = Pass(learningRate, network, data.Training, true, data.LossFunction);
                 double reportedLossValidation = 0;
                 double reportedLossTesting = 0;
                 result[0].Add(reportedLossTrain);
@@ -52,13 +52,13 @@ namespace SharpML.Trainer
 
                 if (data.Validation != null)
                 {
-                    reportedLossValidation = Pass(learningRate, network, data.Validation, false, data.LossTraining);
+                    reportedLossValidation = Pass(learningRate, network, data.Validation, false, data.LossFunction);
                     result[1].Add(reportedLossValidation);
                 }
 
                 if (data.Testing != null)
                 {
-                    reportedLossTesting = Pass(learningRate, network, data.Testing, false, data.LossTraining);
+                    reportedLossTesting = Pass(learningRate, network, data.Testing, false, data.LossFunction);
                     result[2].Add(reportedLossTesting);
                 }
 
@@ -110,15 +110,15 @@ namespace SharpML.Trainer
 
             for (int epoch = 0; epoch < trainingEpochs; epoch++)
             {
-                double reportedLossTrain = Pass(learningRate, network, data.Training, true, data.LossTraining);
+                double reportedLossTrain = Pass(learningRate, network, data.Training, true, data.LossFunction);
                 double reportedLossValidation = 0;
                 double reportedLossTesting = 0;
                 result[0].Add(reportedLossTrain);
 
-                reportedLossValidation = Pass(learningRate, network, data.Validation, false, data.LossTraining);
+                reportedLossValidation = Pass(learningRate, network, data.Validation, false, data.LossFunction);
                 result[1].Add(reportedLossValidation);
 
-                reportedLossTesting = Pass(learningRate, network, data.Testing, false, data.LossTraining);
+                reportedLossTesting = Pass(learningRate, network, data.Testing, false, data.LossFunction);
                 result[2].Add(reportedLossTesting);
 
 

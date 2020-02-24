@@ -6,9 +6,9 @@ namespace SharpML.DataStructs
 {
     public abstract class DataSet 
     {
-        public int InputDimension { get; set; }
-        public int OutputDimension { get; set; }
-        public ILoss LossTraining { get; set; }
+        public Shape InputShape { get; set; }
+        public Shape OutputShape { get; set; }
+        public ILoss LossFunction { get; set; }
         public List<DataSequence> Training { get; set; }
         public List<DataSequence> Validation { get; set; }
         public List<DataSequence> Testing { get; set; }

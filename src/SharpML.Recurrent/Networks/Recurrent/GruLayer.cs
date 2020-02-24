@@ -1,90 +1,156 @@
 ﻿using System;
 using System.Collections.Generic;
 using SharpML.Activations;
+using SharpML.DataStructs;
 using SharpML.Models;
 using SharpML.Networks.Base;
 
 namespace SharpML.Networks.Recurrent
 {
-     [Serializable]
-    public class GruLayer : ILayer {
+    [Serializable]
+    public class GruLayer : ILayer
+    {
 
-	private static  long _serialVersionUid = 1L;
-	int _inputDimension;
-         readonly int _outputDimension;
+        /// <summary>
+        /// Входная размерность
+        /// </summary>
+        public Shape InputShape { get; set; }
+        /// <summary>
+        /// Выходная размерность
+        /// </summary>
+        public Shape OutputShape { get; private set; }
 
-         readonly NNValue _hmix;
-         readonly NNValue _hHmix;
-         readonly NNValue _bmix;
-         readonly NNValue _hnew;
-         readonly NNValue _hHnew;
-         readonly NNValue _bnew;
-         readonly NNValue _hreset;
-         readonly NNValue _hHreset;
-         readonly NNValue _breset;
 
-         NNValue _context;
+        NNValue _hmix;
+        NNValue _hHmix;
+        NNValue _bmix;
+        NNValue _hnew;
+        NNValue _hHnew;
+        NNValue _bnew;
+        NNValue _hreset;
+        NNValue _hHreset;
+        NNValue _breset;
 
-         readonly INonlinearity _fMix = new SigmoidUnit();
-         readonly INonlinearity _fReset = new SigmoidUnit();
-         readonly INonlinearity _fNew = new TanhUnit();
-	
-	public GruLayer(int inputDimension, int outputDimension, double initParamsStdDev, Random rng) {
-		this._inputDimension = inputDimension;
-		this._outputDimension = outputDimension;
-		_hmix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-		_hHmix = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
-		_bmix = new NNValue(outputDimension);
-		_hnew = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-		_hHnew = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
-		_bnew = new NNValue(outputDimension);
-		_hreset = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-		_hHreset = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
-		_breset= new NNValue(outputDimension);
-	}
-	
-	public NNValue Activate(NNValue input, IGraph g)  {
-		
-		NNValue sum0 = g.Mul(_hmix, input);
-		NNValue sum1 = g.Mul(_hHmix, _context);
-		NNValue actMix = g.Nonlin(_fMix, g.Add(g.Add(sum0, sum1), _bmix));
+        NNValue _context;
 
-		NNValue sum2 = g.Mul(_hreset, input);
-		NNValue sum3 = g.Mul(_hHreset, _context);
-		NNValue actReset = g.Nonlin(_fReset, g.Add(g.Add(sum2, sum3), _breset));
-		
-		NNValue sum4 = g.Mul(_hnew, input);
-		NNValue gatedContext = g.Elmul(actReset, _context);
-		NNValue sum5 = g.Mul(_hHnew, gatedContext);
-		NNValue actNewPlusGatedContext = g.Nonlin(_fNew, g.Add(g.Add(sum4, sum5), _bnew));
-		
-		NNValue memvals = g.Elmul(actMix, _context);
-		NNValue newvals = g.Elmul(g.OneMinus(actMix), actNewPlusGatedContext);
-		NNValue output = g.Add(memvals, newvals);
-		
-		//rollover activations for next iteration
-		_context = output;
-		
-		return output;
-	}
+        INonlinearity _fMix = new SigmoidUnit();
+        INonlinearity _fReset = new SigmoidUnit();
+        INonlinearity _fNew = new TanhUnit();
 
-	public void ResetState() {
-		_context = new NNValue(_outputDimension);
-	}
+        public GruLayer(int inputDimension, int outputDimension, double initParamsStdDev, Random rng)
+        {
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
 
-	public List<NNValue> GetParameters() {
-		List<NNValue> result = new List<NNValue>();
-		result.Add(_hmix);
-        result.Add(_hHmix);
-        result.Add(_bmix);
-        result.Add(_hnew);
-        result.Add(_hHnew);
-        result.Add(_bnew);
-        result.Add(_hreset);
-        result.Add(_hHreset);
-        result.Add(_breset);
-		return result;
-	}
+            _hmix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHmix = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _bmix = new NNValue(outputDimension);
+            _hnew = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHnew = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _bnew = new NNValue(outputDimension);
+            _hreset = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHreset = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _breset = new NNValue(outputDimension);
+        }
 
-}
+        public GruLayer(Shape inputShape, int outputDimension, double initParamsStdDev, Random rng)
+        {
+            int inputDimension = inputShape.H;
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+
+            _hmix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHmix = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _bmix = new NNValue(outputDimension);
+            _hnew = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHnew = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _bnew = new NNValue(outputDimension);
+            _hreset = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHreset = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _breset = new NNValue(outputDimension);
+        }
+
+        public GruLayer(int outputDimension)
+        {
+            OutputShape = new Shape(outputDimension);
+        }
+
+
+
+        public NNValue Activate(NNValue input, IGraph g)
+        {
+
+            NNValue sum0 = g.Mul(_hmix, input);
+            NNValue sum1 = g.Mul(_hHmix, _context);
+            NNValue actMix = g.Nonlin(_fMix, g.Add(g.Add(sum0, sum1), _bmix));
+
+            NNValue sum2 = g.Mul(_hreset, input);
+            NNValue sum3 = g.Mul(_hHreset, _context);
+            NNValue actReset = g.Nonlin(_fReset, g.Add(g.Add(sum2, sum3), _breset));
+
+            NNValue sum4 = g.Mul(_hnew, input);
+            NNValue gatedContext = g.Elmul(actReset, _context);
+            NNValue sum5 = g.Mul(_hHnew, gatedContext);
+            NNValue actNewPlusGatedContext = g.Nonlin(_fNew, g.Add(g.Add(sum4, sum5), _bnew));
+
+            NNValue memvals = g.Elmul(actMix, _context);
+            NNValue newvals = g.Elmul(g.OneMinus(actMix), actNewPlusGatedContext);
+            NNValue output = g.Add(memvals, newvals);
+
+            //rollover activations for next iteration
+            _context = output;
+
+            return output;
+        }
+
+        public void ResetState()
+        {
+            _context = new NNValue(OutputShape.H);
+        }
+
+        public List<NNValue> GetParameters()
+        {
+            List<NNValue> result = new List<NNValue>();
+            result.Add(_hmix);
+            result.Add(_hHmix);
+            result.Add(_bmix);
+            result.Add(_hnew);
+            result.Add(_hHnew);
+            result.Add(_bnew);
+            result.Add(_hreset);
+            result.Add(_hHreset);
+            result.Add(_breset);
+            return result;
+        }
+
+        /// <summary>
+        /// Генерация слоя НС
+        /// </summary>
+        /// <param name="inpShape"></param>
+        /// <param name="random"></param>
+        /// <param name="std"></param>
+        /// <returns></returns>
+        public void Generate(Shape inpShape, Random random, double std)
+        {
+            Init(inpShape, OutputShape.H, std, random);
+        }
+
+        void Init(Shape inputShape, int outputDimension, double initParamsStdDev, Random rng)
+        {
+            int inputDimension = inputShape.H;
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+
+            _hmix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHmix = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _bmix = new NNValue(outputDimension);
+            _hnew = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHnew = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _bnew = new NNValue(outputDimension);
+            _hreset = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
+            _hHreset = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _breset = new NNValue(outputDimension);
+        }
+
+    }
 }

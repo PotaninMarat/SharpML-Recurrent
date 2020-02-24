@@ -10,14 +10,26 @@ namespace SharpML.Networks.ConvDeconv
 {
     public class Flatten : ILayer
     {
+        public Shape InputShape { get; set; }
+        public Shape OutputShape { get; private set; }
+
         float _gain = 1.0f;
 
-        public Flatten() { }
-
-        public Flatten(float gain)
+        public Flatten(Shape inputShape)
         {
+            InputShape = inputShape;
+            OutputShape = new Shape(InputShape.Len);
+        }
+
+        public Flatten(Shape inputShape, float gain)
+        {
+            InputShape = inputShape;
+            OutputShape = new Shape(InputShape.Len);
             _gain = gain;
         }
+
+        public Flatten() { }
+        
 
         public NNValue Activate(NNValue input, IGraph g)
         {
@@ -34,6 +46,12 @@ namespace SharpML.Networks.ConvDeconv
         public void ResetState()
         {
 
+        }
+
+        public void Generate(Shape inpShape, Random random, double std)
+        {
+            InputShape = inpShape;
+            OutputShape = new Shape(InputShape.Len);
         }
     }
 }

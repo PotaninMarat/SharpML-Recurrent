@@ -3,33 +3,57 @@ using System.Collections.Generic;
 using SharpML.Networks.Base;
 using SharpML.Activations;
 using SharpML.Models;
+using SharpML.DataStructs;
 
 namespace SharpML.Networks.Recurrent
 {
-     [Serializable]
+    [Serializable]
     public class RnnLayer : ILayer
     {
 
-        private static long _serialVersionUid = 1L;
-        private int _inputDimension;
-        private readonly int _outputDimension;
+        /// <summary>
+        /// Входная размерность
+        /// </summary>
+        public Shape InputShape { get; set; }
+        /// <summary>
+        /// Выходная размерность
+        /// </summary>
+        public Shape OutputShape { get; private set; }
 
-        private readonly NNValue _w;
-         private readonly NNValue _b;
+        NNValue _w;
+        NNValue _b;
 
-         private NNValue _context;
+        NNValue _context;
 
-        private readonly INonlinearity _f;
+        INonlinearity _f;
 
         public RnnLayer(int inputDimension, int outputDimension, INonlinearity hiddenUnit, double initParamsStdDev,
             Random rng)
         {
-            this._inputDimension = inputDimension;
-            this._outputDimension = outputDimension;
-            this._f = hiddenUnit;
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+            _f = hiddenUnit;
             _w = NNValue.Random(outputDimension, inputDimension + outputDimension, initParamsStdDev, rng);
             _b = new NNValue(outputDimension);
             ResetState();
+        }
+
+        public RnnLayer(Shape inputShape, int outputDimension, INonlinearity hiddenUnit, double initParamsStdDev,
+            Random rng)
+        {
+            int inputDimension = inputShape.H;
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+            _f = hiddenUnit;
+            _w = NNValue.Random(outputDimension, inputDimension + outputDimension, initParamsStdDev, rng);
+            _b = new NNValue(outputDimension);
+            ResetState();
+        }
+
+        public RnnLayer(int outputDimension, INonlinearity hiddenUnit)
+        {
+            OutputShape = new Shape(outputDimension);
+            _f = hiddenUnit;
         }
 
         public NNValue Activate(NNValue input, IGraph g)
@@ -47,7 +71,7 @@ namespace SharpML.Networks.Recurrent
 
         public void ResetState()
         {
-            _context = new NNValue(_outputDimension);
+            _context = new NNValue(OutputShape.H);
         }
 
 
@@ -57,6 +81,23 @@ namespace SharpML.Networks.Recurrent
             result.Add(_w);
             result.Add(_b);
             return result;
+        }
+
+        public void Generate(Shape inpShape, Random random, double std)
+        {
+            Init(inpShape, OutputShape.H, _f, std, random);
+        }
+
+        void Init(Shape inputShape, int outputDimension, INonlinearity hiddenUnit, double initParamsStdDev,
+            Random rng)
+        {
+            int inputDimension = inputShape.H;
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+            _f = hiddenUnit;
+            _w = NNValue.Random(outputDimension, inputDimension + outputDimension, initParamsStdDev, rng);
+            _b = new NNValue(outputDimension);
+            ResetState();
         }
     }
 }

@@ -33,6 +33,22 @@
 * SQRBFUnit
 * TanhUnit
 
+### Код примера
+
+```
+NeuralNetwork cNN = new NeuralNetwork(random, 0.1);
+
+cNN.AddNewLayer(new Shape(28, 28), new ConvolutionLayer(new RectifiedLinearUnit(0.01), 8, 3, 3));
+cNN.AddNewLayer(new MaxPooling(2, 2));
+cNN.AddNewLayer(new ConvolutionLayer(new RectifiedLinearUnit(0.01), 16, 3, 3));
+cNN.AddNewLayer(new MaxPooling(2, 2));
+cNN.AddNewLayer(new ConvolutionLayer(new RectifiedLinearUnit(0.01), 32, 3, 3));
+cNN.AddNewLayer(new MaxPooling(2, 2));
+
+cNN.AddNewLayer(new Flatten());
+cNN.AddNewLayer(new LstmLayer(10));
+cNN.AddNewLayer(new FeedForwardLayer(2, new SoftmaxUnit()));
+```
 
 ### Лицензия
 ### MIT

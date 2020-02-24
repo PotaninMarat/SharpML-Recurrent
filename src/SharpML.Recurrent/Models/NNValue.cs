@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpML.DataStructs;
+using System;
 using System.IO;
 using System.Text;
 
@@ -266,6 +267,11 @@ namespace SharpML.Models
             File.WriteAllLines(path, conent); 
         }
 
+        public Shape GetShape()
+        {
+            return new Shape(H, W, D);
+        }
+
         private int GetByIndex(int h, int w)
         {
             int ix = W * h + w;
@@ -277,6 +283,8 @@ namespace SharpML.Models
             int ix = W * h + w+_s*d;
             return ix;
         }
+
+
 
         private double GetW(int h, int w)
         {

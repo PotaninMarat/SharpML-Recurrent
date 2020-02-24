@@ -11,9 +11,9 @@ namespace SharpML.DataStructs.DataSets
     {
         public DataSetNoReccurent(NNValue[] inputs, NNValue[] outputs, ILoss los)
         {
-            InputDimension = inputs[0].Len;
-            OutputDimension = outputs[0].Len;
-            LossTraining = los;
+            InputShape = inputs[0].GetShape();
+            OutputShape = outputs[0].GetShape();
+            LossFunction = los;
 
             var data = GetSequences(inputs, outputs);
 

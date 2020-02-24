@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SharpML</RootNamespace>
     <AssemblyName>SharpML</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,7 +46,6 @@
     <Compile Include="Activations\ArcTanUnit.cs" />
     <Compile Include="Activations\EliotSigUnit.cs" />
     <Compile Include="Activations\GaussianRbfUnit.cs" />
-    <Compile Include="Activations\MaxOutUnit.cs" />
     <Compile Include="Activations\SoftmaxUnit.cs" />
     <Compile Include="Activations\SqnlUnit.cs" />
     <Compile Include="Activations\SQRBFUnit.cs" />
@@ -56,7 +58,6 @@
     <Compile Include="DataStructs\DataStep.cs" />
     <Compile Include="Models\GraphCPU.cs" />
     <Compile Include="Loss\LossSumOfSquares.cs" />
-    <Compile Include="Loss\LossSoftmax.cs" />
     <Compile Include="Loss\LossMultiDimensionalBinary.cs" />
     <Compile Include="Loss\LossArgMax.cs" />
     <Compile Include="Loss\ILoss.cs" />

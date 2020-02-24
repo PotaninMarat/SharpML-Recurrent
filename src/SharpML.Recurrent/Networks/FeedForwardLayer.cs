@@ -1,4 +1,5 @@
 ﻿using SharpML.Activations;
+using SharpML.DataStructs;
 using SharpML.Models;
 using SharpML.Networks.Base;
 using System;
@@ -9,16 +10,40 @@ namespace SharpML.Networks
     [Serializable]
     public class FeedForwardLayer : ILayer
     {
-
-        private static long _serialVersionUid = 1L;
-        public readonly NNValue _w;
-        public readonly NNValue _b;
+        public NNValue _w;
+        public NNValue _b;
         public INonlinearity _f;
+
+        /// <summary>
+        /// Входная размерность
+        /// </summary>
+        public Shape InputShape { get; set; }
+        /// <summary>
+        /// Выходная размерность
+        /// </summary>
+        public Shape OutputShape { get; private set; }
 
         public FeedForwardLayer(int inputDimension, int outputDimension, INonlinearity f, double initParamsStdDev, Random rng)
         {
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
             _w = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
             _b = new NNValue(outputDimension);
+            this._f = f;
+        }
+
+        public FeedForwardLayer(Shape inputShape, int outputDimension, INonlinearity f, double initParamsStdDev, Random rng)
+        {
+            InputShape = inputShape;
+            OutputShape = new Shape(outputDimension);
+            _w = NNValue.Random(OutputShape.H, InputShape.H, initParamsStdDev, rng);
+            _b = new NNValue(outputDimension);
+            this._f = f;
+        }
+
+        public FeedForwardLayer(int outputDimension, INonlinearity f)
+        {
+            OutputShape = new Shape(outputDimension);
             this._f = f;
         }
 
@@ -40,6 +65,12 @@ namespace SharpML.Networks
             result.Add(_w);
             result.Add(_b);
             return result;
+        }
+
+        public void Generate(Shape inpShape, Random random, double std)
+        {
+            _w = NNValue.Random(OutputShape.H, inpShape.H, std, random);
+            _b = new NNValue(OutputShape.H);
         }
     }
 }

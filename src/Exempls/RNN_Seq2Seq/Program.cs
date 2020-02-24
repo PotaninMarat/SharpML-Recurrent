@@ -134,9 +134,9 @@ namespace RNN_Seq2Seq
     {
         public DataSetSeq2Seq(List<int[]> dataInp, List<int[]> dataOutp)
         {
-            InputDimension = 10;
-            OutputDimension = 10;
-            LossTraining = new CrossEntropyWithSoftmax();
+            InputShape = new Shape(10);
+            OutputShape = new Shape(10);
+            LossFunction = new CrossEntropyWithSoftmax();
 
             var r = GetDataSequences(dataInp, dataOutp);
 

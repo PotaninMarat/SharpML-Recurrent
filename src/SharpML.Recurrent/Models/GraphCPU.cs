@@ -273,7 +273,7 @@ namespace SharpML.Models
 
             NNValue returnObj = new NNValue(outpH, outpW, outpD);
 
-            Parallel.For(0, outpD, s =>
+            Parallel.For(0, outpD, new ParallelOptions() { MaxDegreeOfParallelism = 2}, s =>
             {
                 for (int y = 0; y < outpH; y++)
                 {
@@ -305,7 +305,7 @@ namespace SharpML.Models
                 bp.Run = delegate ()
                 {
 
-                    Parallel.For(0, outpD, d =>
+                    Parallel.For(0, outpD, new ParallelOptions() { MaxDegreeOfParallelism = 2 }, d =>
                     {
                         for (int z = 0; z < input.D; z++)
                         {
@@ -328,7 +328,7 @@ namespace SharpML.Models
                         }
                     });
 
-                    Parallel.For(0, input.D, n =>
+                    Parallel.For(0, input.D, new ParallelOptions() { MaxDegreeOfParallelism = 2 }, n =>
                     {
                         for (int y = 0; y < input.H; y++)
                         {
@@ -387,8 +387,11 @@ namespace SharpML.Models
                 throw new Exception("Недостаточная размерность выхода");
             }
 
-            int maxX = input.W - w / 2;
-            int maxY = input.H - h / 2;
+            int modW = input.W % w;
+            int modH = input.H % h;
+
+            int maxX = input.W - modW;
+            int maxY = input.H - modH;
 
             NNValue returnObj = new NNValue(outpH, outpW, outpD);
 

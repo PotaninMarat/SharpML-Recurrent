@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SharpML.Activations;
+using SharpML.DataStructs;
 using SharpML.Models;
 using SharpML.Networks.Base;
 
@@ -10,50 +11,81 @@ namespace SharpML.Networks.Recurrent
     public class LstmLayer : ILayer
     {
 
-        private static long _serialVersionUid = 1L;
-        int _inputDimension;
-        readonly int _outputDimension;
+        /// <summary>
+        /// Входная размерность
+        /// </summary>
+        public Shape InputShape { get; set; }
+        /// <summary>
+        /// Выходная размерность
+        /// </summary>
+        public Shape OutputShape { get; private set; }
 
-        readonly NNValue _wix;
-        readonly NNValue _wih;
-        readonly NNValue _inputBias;
-        readonly NNValue _wfx;
-        readonly NNValue _wfh;
-        readonly NNValue _forgetBias;
-        readonly NNValue _wox;
-        readonly NNValue _woh;
-        readonly NNValue _outputBias;
-        readonly NNValue _wcx;
-        readonly NNValue _wch;
-        readonly NNValue _cellWriteBias;
+        NNValue _wix;
+        NNValue _wih;
+        NNValue _inputBias;
+        NNValue _wfx;
+        NNValue _wfh;
+        NNValue _forgetBias;
+        NNValue _wox;
+        NNValue _woh;
+        NNValue _outputBias;
+        NNValue _wcx;
+        NNValue _wch;
+        NNValue _cellWriteBias;
 
         NNValue _hiddenContext;
         NNValue _cellContext;
 
-        readonly INonlinearity _inputGateActivation = new SigmoidUnit();
-        readonly INonlinearity _forgetGateActivation = new SigmoidUnit();
-        readonly INonlinearity _outputGateActivation = new SigmoidUnit();
-        readonly INonlinearity _cellInputActivation = new TanhUnit();
-        readonly INonlinearity _cellOutputActivation = new TanhUnit();
+        INonlinearity _inputGateActivation = new SigmoidUnit();
+        INonlinearity _forgetGateActivation = new SigmoidUnit();
+        INonlinearity _outputGateActivation = new SigmoidUnit();
+        INonlinearity _cellInputActivation = new TanhUnit();
+        INonlinearity _cellOutputActivation = new TanhUnit();
 
-        public LstmLayer(int inputDimension, int outputDimension, double initParamsStdDev, Random rng)
+        public LstmLayer(int inputDimension, int outputDimension, double initParamsStdDev, Random rnd)
         {
-            this._inputDimension = inputDimension;
-            this._outputDimension = outputDimension;
-            _wix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-            _wih = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+            _wix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wih = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
             _inputBias = new NNValue(outputDimension);
-            _wfx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-            _wfh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _wfx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wfh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
             //set forget bias to 1.0, as described here: http://jmlr.org/proceedings/papers/v37/jozefowicz15.pdf
             _forgetBias = NNValue.Ones(outputDimension, 1);
-            _wox = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-            _woh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _wox = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _woh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
             _outputBias = new NNValue(outputDimension);
-            _wcx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
-            _wch = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
+            _wcx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wch = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
             _cellWriteBias = new NNValue(outputDimension);
             ResetState(); // Запуск НС
+        }
+
+        public LstmLayer(Shape inputShape, int outputDimension, double initParamsStdDev, Random rnd)
+        {
+            int inputDimension = inputShape.H;
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+            _wix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wih = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            _inputBias = new NNValue(outputDimension);
+            _wfx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wfh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            //set forget bias to 1.0, as described here: http://jmlr.org/proceedings/papers/v37/jozefowicz15.pdf
+            _forgetBias = NNValue.Ones(outputDimension, 1);
+            _wox = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _woh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            _outputBias = new NNValue(outputDimension);
+            _wcx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wch = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            _cellWriteBias = new NNValue(outputDimension);
+            ResetState(); // Запуск НС
+        }
+
+        public LstmLayer(int outputDimension)
+        {
+            OutputShape = new Shape(outputDimension);
         }
 
         public NNValue Activate(NNValue input, IGraph g)
@@ -96,8 +128,8 @@ namespace SharpML.Networks.Recurrent
 
         public void ResetState()
         {
-            _hiddenContext = new NNValue(_outputDimension);
-            _cellContext = new NNValue(_outputDimension);
+            _hiddenContext = new NNValue(OutputShape.H);
+            _cellContext = new NNValue(OutputShape.H);
         }
 
         public List<NNValue> GetParameters()
@@ -116,6 +148,41 @@ namespace SharpML.Networks.Recurrent
             result.Add(_wch);
             result.Add(_cellWriteBias);
             return result;
+        }
+
+        /// <summary>
+        /// Генерация слоя НС
+        /// </summary>
+        /// <param name="inpShape"></param>
+        /// <param name="random"></param>
+        /// <param name="std"></param>
+        /// <returns></returns>
+        public void Generate(Shape inpShape, Random random, double std)
+        {
+            Init(inpShape, OutputShape.H, std, random);
+        }
+
+        /// <summary>
+        /// Инициализация сети
+        /// </summary>
+        void Init(Shape inputShape, int outputDimension, double initParamsStdDev, Random rnd)
+        {
+            int inputDimension = inputShape.H;
+            InputShape = new Shape(inputDimension);
+            OutputShape = new Shape(outputDimension);
+            _wix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wih = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            _inputBias = new NNValue(outputDimension);
+            _wfx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wfh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            _forgetBias = NNValue.Ones(outputDimension, 1);
+            _wox = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _woh = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            _outputBias = new NNValue(outputDimension);
+            _wcx = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rnd);
+            _wch = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
+            _cellWriteBias = new NNValue(outputDimension);
+            ResetState();
         }
     }
 }
