@@ -1,4 +1,4 @@
-# SharpML-Recurrent test test test
+# SharpML-Recurrent 111111111111111111111111111
 Реплика проекта Андрея Корпатого "RecurrentJs" и Thomas Lahore's "RecurrentJava" на языке C#.
 
 * [Проект на Java: (MIT)](https://github.com/evolvingstuff/RecurrentJava)
