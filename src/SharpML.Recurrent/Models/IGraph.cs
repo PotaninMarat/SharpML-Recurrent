@@ -41,7 +41,7 @@ namespace SharpML.Models
         /// <param name="input">Тензор входа</param>
         /// <param name="filters">Фильтры</param>
         /// <param name="isSame"></param>
-        NNValue Convolution(NNValue input, NNValue[] filters, bool isSame);
+        NNValue Convolution(NNValue input, NNValue[] filters, int padX, int padY);
 
         NNValue MaxPooling(NNValue inp, int h, int w);
 
@@ -53,5 +53,7 @@ namespace SharpML.Models
         /// <param name="gain">Усиление градиента</param>
         /// <returns></returns>
         NNValue ReShape(NNValue input, Shape newShape, float gain);
+
+        NNValue UnPooling(NNValue inp, int h, int w);
     }
 }

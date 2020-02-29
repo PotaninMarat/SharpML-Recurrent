@@ -14,6 +14,8 @@ namespace SharpML.Networks.ConvDeconv
         public Shape InputShape { get; set; }
         public Shape OutputShape { get; private set; }
         int _h, _w;
+        public int TrainableParameters => 0;
+
 
         public MaxPooling(Shape inputShape, int h =2, int w =2)
         {
@@ -57,6 +59,15 @@ namespace SharpML.Networks.ConvDeconv
             InputShape = inputShape;
             _h = h;
             _w = w;
+        }
+
+        /// <summary>
+        /// Описание слоя
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Format("MaxPooling\t   \t|inp: {0} |outp: {1}|TrainParams: {2}", InputShape, OutputShape, TrainableParameters);
         }
     }
 }

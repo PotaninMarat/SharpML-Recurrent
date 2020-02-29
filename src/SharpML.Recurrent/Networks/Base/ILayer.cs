@@ -9,7 +9,7 @@ namespace SharpML.Networks.Base
     {
         Shape InputShape { get; set; }
         Shape OutputShape { get;}
-
+        int TrainableParameters { get; }
 
         NNValue Activate(NNValue input, IGraph g);
         void ResetState();

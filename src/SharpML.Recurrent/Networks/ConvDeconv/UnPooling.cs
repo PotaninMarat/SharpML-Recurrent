@@ -5,46 +5,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SharpML.Networks.ConvDeconv
 {
-    public class ReShape : ILayer
+    public class UnPooling : ILayer
     {
-
-        /// <summary>
-        /// Входная размерность
-        /// </summary>
         public Shape InputShape { get; set; }
-        /// <summary>
-        /// Выходная размерность
-        /// </summary>
         public Shape OutputShape { get; private set; }
-        float _gain = 1.0f;
+        int _h, _w;
         public int TrainableParameters => 0;
 
 
-
-        public ReShape(Shape inputShape, Shape newShape)
+        public UnPooling(Shape inputShape, int h = 2, int w = 2)
         {
+            OutputShape = new Shape(inputShape.H*h, inputShape.W*w, inputShape.D);
             InputShape = inputShape;
-            OutputShape = newShape;
+            _h = h;
+            _w = w;
         }
 
-        public ReShape(Shape inputShape, Shape newShape, float gain = 1.0f)
+        public UnPooling(int h = 2, int w = 2)
         {
-            InputShape = inputShape;
-            OutputShape = newShape;
-            _gain = gain;
+            _h = h;
+            _w = w;
         }
 
-        public ReShape(Shape newShape)
-        {
-            OutputShape = newShape;
-        }
 
         public NNValue Activate(NNValue input, IGraph g)
         {
-            return g.ReShape(input, OutputShape, _gain);
+            NNValue res = g.UnPooling(input, _h, _w);
+            return res;
         }
 
         public List<NNValue> GetParameters()
@@ -59,7 +50,15 @@ namespace SharpML.Networks.ConvDeconv
 
         public void Generate(Shape inpShape, Random random, double std)
         {
-            InputShape = inpShape;
+            Init(inpShape, _h, _w);
+        }
+
+        void Init(Shape inputShape, int h = 2, int w = 2)
+        {
+            OutputShape = new Shape(inputShape.H*h, inputShape.W* w, inputShape.D);
+            InputShape = inputShape;
+            _h = h;
+            _w = w;
         }
 
         /// <summary>
@@ -68,7 +67,7 @@ namespace SharpML.Networks.ConvDeconv
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("ReShape\t|inp: {0} |outp: {1} |TrainParams: {2}", InputShape, OutputShape, TrainableParameters);
+            return string.Format("UnPooling\t\t|inp: {0} |outp: {1}|TrainParams: {2}", InputShape, OutputShape, TrainableParameters);
         }
     }
 }

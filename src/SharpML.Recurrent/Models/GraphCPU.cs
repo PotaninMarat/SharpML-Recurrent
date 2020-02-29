@@ -45,14 +45,14 @@ namespace SharpML.Models
             int loc = 0;
             for (int i = 0; i < m1.DataInTensor.Length; i++)
             {
-                returnObj.DataInTensor[loc] = m1.DataInTensor[i];
+                returnObj[loc] = m1[i];
                 returnObj.DifData[loc] = m1.DifData[i];
                 returnObj.StepCache[loc] = m1.StepCache[i];
                 loc++;
             }
             for (int i = 0; i < m2.DataInTensor.Length; i++)
             {
-                returnObj.DataInTensor[loc] = m2.DataInTensor[i];
+                returnObj[loc] = m2[i];
                 returnObj.DifData[loc] = m2.DifData[i];
                 returnObj.StepCache[loc] = m2.StepCache[i];
                 loc++;
@@ -243,27 +243,18 @@ namespace SharpML.Models
         }
 
         /// <summary>
-        /// Свертка (добавить Same)
+        /// Свертка
         /// </summary>
         /// <param name="input">Тензор входа</param>
         /// <param name="filters">Фильтры</param>
-        /// <param name="isSame"></param>
-        /// <param name="stride"></param>
-        public NNValue Convolution(NNValue input, NNValue[] filters, bool isSame)
+        public NNValue Convolution(NNValue input, NNValue[] filters, int padX, int padY)
         {
 
             int outpH, outpW, outpD = filters.Length;
                 
-            if (isSame)
-            {
-                outpH = input.H;
-                outpW = input.W;
-            }
-            else
-            {
-                outpH = input.H - filters[0].H + 1;
-                outpW = input.W - filters[0].W + 1;
-            }
+         
+           outpH = input.H - filters[0].H + 1+padY;
+           outpW = input.W - filters[0].W + 1+padX;
 
             if ( (outpW < 1) || (outpH < 1) )
             {
@@ -273,25 +264,34 @@ namespace SharpML.Models
 
             NNValue returnObj = new NNValue(outpH, outpW, outpD);
 
-            Parallel.For(0, outpD, new ParallelOptions() { MaxDegreeOfParallelism = 2}, s =>
+            //  Parallel.For(0, outpD, new ParallelOptions() { MaxDegreeOfParallelism = 2}, s =>
+            for (int s = 0; s < outpD; s++)
             {
-                for (int y = 0; y < outpH; y++)
+
+                
+
+                for (int y = -padY; y < outpH; y++)
                 {
-                    for (int x = 0; x < outpW; x++)
+
+                    for (int x = -padX; x < outpW; x++)
                     {
                         for (int z = 0; z < input.D; z++)
                         {
                             for (int dy = 0; dy < filters[0].H; dy++)
                             {
+                                int y1 = y + dy;
+
                                 for (int dx = 0; dx < filters[0].W; dx++)
                                 {
-                                    returnObj[y, x, s] += input[y + dy, x + dx, z] * filters[s][dy, dx, z];
+                                    int x1 = x + dx;
+                                    if ((x1 > -1) && (y1 > -1)&& (x1 < outpW) && (y1 < outpH))
+                                    returnObj[y1, x1, s] += input[y + dy, x + dx, z] * filters[s][dy, dx, z];
                                 }
                             }
                         }
                     }
                 }
-            });
+            }
 
             //------------------------------------------------------------------------------------------
             
@@ -313,16 +313,23 @@ namespace SharpML.Models
                             {
                                 for (int x = 0; x < filters[0].W; x++)
                                 {
-                                    for (int a = 0; a < outpH; a++)
-                                        for (int b = 0; b < outpW; b++)
+                                    for (int a = -padY; a < outpH; a++)
+                                    {
+                                        
+                                        for (int b = -padX; b < outpW; b++)
                                         {
-                                            double delt = returnObj.DifData[outpW * a + b + outpW*outpH * d];
+                                            int x1 = b + x;
+                                            int y1 = a + y;
 
-                                            filters[d].DifData[filters[0].W * y + x + filters[0].W * filters[0].H * z] +=
-                                            delt * input[a + y, b + x, z];
-
+                                            if ((y1 > -1) && (x1 > -1) && (y1 < outpH) && (x1 < outpW))
+                                            {
+                                                double delt = returnObj.DifData[outpW * y1 + x1 + outpW * outpH * d];
+                                                filters[d].DifData[filters[0].W * y + x + filters[0].W * filters[0].H * z] +=
+                                                delt * input[a + y, b + x, z];
+                                            }
                                             // --------------- ------------- ------------ ---------------//
                                         }
+                                    }
                                 }
                             }
                         }
@@ -330,9 +337,9 @@ namespace SharpML.Models
 
                     Parallel.For(0, input.D, new ParallelOptions() { MaxDegreeOfParallelism = 2 }, n =>
                     {
-                        for (int y = 0; y < input.H; y++)
+                        for (int y = -padY; y < input.H; y++)
                         {
-                            for (int x = 0; x < input.W; x++)
+                            for (int x = -padX; x < input.W; x++)
                             {
                                 for (int i = 0; i < outpD; i++)
                                 {
@@ -344,19 +351,18 @@ namespace SharpML.Models
                                             var dxx = x - dx;
                                             if ((dyy > -1) && (dxx > -1) && (dyy < outpH) && (dxx < outpW))
                                             {
-                                                double delt = returnObj.DifData[outpW * (y-dy) + (x-dx) + outpW * outpH * i];
-                                                input.DifData[input.W * y + x + input.W * input.H * n] += delt * filters[i][dy, dx, n];  
+                                                if ((dxx > -1) && (dyy > -1) && (dyy < outpH) && (dxx < outpW))
+                                                {
+                                                    double delt = returnObj.DifData[outpW * (y - dy) + (x - dx) + outpW * outpH * i];
+                                                    input.DifData[input.W * y + x + input.W * input.H * n] += delt * filters[i][dy, dx, n];
+                                                }
                                             }
-
                                         }
                                     }
                                 }
                             }
                         }
-                      
                     });
-
-
                 };
                 Backprop.Add(bp);
             }
@@ -493,6 +499,56 @@ namespace SharpML.Models
 
 
             return outp;
+        }
+
+        public NNValue UnPooling(NNValue inp, int h, int w)
+        {
+            int outpH = inp.H * h, outpW = inp.W * w, outpD = inp.D;
+            //double[] data = new double[h * w];
+            //bool[,,] map = new bool[inp.H, inp.W, inp.D];
+
+
+            if ((outpW < 1) || (outpH < 1))
+            {
+                throw new Exception("Недостаточная размерность выхода");
+            }
+
+            
+            NNValue returnObj = new NNValue(outpH, outpW, outpD);
+
+            for (int s = 0; s < outpD; s++)
+            {
+                for (int y = 0, y1 = 0; y < outpH; y += h, y1++)
+                {
+                    for (int x = 0, x1 = 0; x < outpW; x += w, x1++)
+                    {
+                        returnObj[y, x, s] = inp[y1,x1,s];
+                    }
+                }
+            };
+            //------------------------------------------------------------------------------------------
+
+            // Обратный проход
+            if (this.ApplyBackprop)
+            {
+
+                Runnable bp = new Runnable();
+                bp.Run = delegate ()
+                {
+                    for (int n = 0; n < inp.D; n++)
+                    {
+                        for (int y = 0, y1 = 0; y < inp.H; y++, y1+=h)
+                        {
+                            for (int x = 0, x1 =0; x < inp.W; x++, x1+=w)
+                            {
+                                inp.DifData[inp.W * y + x + inp.W * inp.H * n] = returnObj.DifData[outpW * y1 + x1 + outpW * outpW * n];
+                            }
+                        }
+                    }
+                };
+                Backprop.Add(bp);
+            }
+            return returnObj;
         }
     }
 }

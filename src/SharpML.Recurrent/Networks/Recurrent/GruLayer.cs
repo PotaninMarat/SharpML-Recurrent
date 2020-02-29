@@ -20,6 +20,16 @@ namespace SharpML.Networks.Recurrent
         /// </summary>
         public Shape OutputShape { get; private set; }
 
+        /// <summary>
+        /// Обучаемые параметры
+        /// </summary>
+        public int TrainableParameters
+        {
+            get
+            {
+                return 3 * OutputShape.H*(InputShape.H +  OutputShape.H);
+            }
+        }
 
         NNValue _hmix;
         NNValue _hHmix;
@@ -37,10 +47,12 @@ namespace SharpML.Networks.Recurrent
         INonlinearity _fReset = new SigmoidUnit();
         INonlinearity _fNew = new TanhUnit();
 
-        public GruLayer(int inputDimension, int outputDimension, double initParamsStdDev, Random rng)
+        public GruLayer(int inputDimension, int outputDimension,  Random rng)
         {
             InputShape = new Shape(inputDimension);
             OutputShape = new Shape(outputDimension);
+
+            double initParamsStdDev = 1.0 / Math.Sqrt(outputDimension);
 
             _hmix = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
             _hHmix = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
@@ -53,8 +65,9 @@ namespace SharpML.Networks.Recurrent
             _breset = new NNValue(outputDimension);
         }
 
-        public GruLayer(Shape inputShape, int outputDimension, double initParamsStdDev, Random rng)
+        public GruLayer(Shape inputShape, int outputDimension, Random rng)
         {
+            double initParamsStdDev = 1.0 / Math.Sqrt(outputDimension);
             int inputDimension = inputShape.H;
             InputShape = new Shape(inputDimension);
             OutputShape = new Shape(outputDimension);
@@ -132,11 +145,12 @@ namespace SharpML.Networks.Recurrent
         /// <returns></returns>
         public void Generate(Shape inpShape, Random random, double std)
         {
-            Init(inpShape, OutputShape.H, std, random);
+            Init(inpShape, OutputShape.H, random);
         }
 
-        void Init(Shape inputShape, int outputDimension, double initParamsStdDev, Random rng)
+        void Init(Shape inputShape, int outputDimension, Random rng)
         {
+            double initParamsStdDev = 1.0 / Math.Sqrt(outputDimension);
             int inputDimension = inputShape.H;
             InputShape = new Shape(inputDimension);
             OutputShape = new Shape(outputDimension);
@@ -150,6 +164,15 @@ namespace SharpML.Networks.Recurrent
             _hreset = NNValue.Random(outputDimension, inputDimension, initParamsStdDev, rng);
             _hHreset = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rng);
             _breset = new NNValue(outputDimension);
+        }
+
+        /// <summary>
+        /// Описание слоя
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Format("GruLayer        \t|inp: {0} |outp: {1} |Non lin. activate: {3} |TrainParams: {2}", InputShape, OutputShape, TrainableParameters, "sigm/tanh");
         }
 
     }

@@ -12,6 +12,7 @@ namespace SharpML.Networks.ConvDeconv
     {
         public Shape InputShape { get; set; }
         public Shape OutputShape { get; private set; }
+        public int TrainableParameters => 0;
 
         float _gain = 1.0f;
 
@@ -52,6 +53,15 @@ namespace SharpML.Networks.ConvDeconv
         {
             InputShape = inpShape;
             OutputShape = new Shape(InputShape.Len);
+        }
+
+        /// <summary>
+        /// Описание слоя
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Format("Flatten          \t|inp: {0} |outp: {1}|TrainParams: {2}", InputShape, OutputShape, TrainableParameters);
         }
     }
 }

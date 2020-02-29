@@ -13,6 +13,7 @@ using SharpML.Loss;
 using SharpML.Trainer;
 using SharpML.DataStructs;
 using SharpML.Networks.Recurrent;
+using SharpML.Trainer.Optimizers;
 
 namespace CnnTest
 {
@@ -22,26 +23,37 @@ namespace CnnTest
         {
             Random random = new Random(13);
 
-            NeuralNetwork cNN = new NeuralNetwork(random, 0.1);
 
-            cNN.AddNewLayer(new Shape(28, 28), new ConvolutionLayer(new RectifiedLinearUnit(0.01), 8, 3, 3));
+
+            NeuralNetwork cNN = new NeuralNetwork(random, 0.2);
+
+            var conv = new ConvolutionLayer(new RectifiedLinearUnit(0.01), 8, 3, 3);
+            conv.IsSame = true;
+
+
+            cNN.AddNewLayer(new Shape(28, 28), conv);
             cNN.AddNewLayer(new MaxPooling(2, 2));
 
             cNN.AddNewLayer(new ConvolutionLayer(new RectifiedLinearUnit(0.01), 16, 3, 3));
             cNN.AddNewLayer(new MaxPooling(2, 2));
 
             cNN.AddNewLayer(new ConvolutionLayer(new RectifiedLinearUnit(0.01), 32, 3, 3));
+            cNN.AddNewLayer(new UnPooling(2, 2));
+
+            cNN.AddNewLayer(new ConvolutionLayer(new RectifiedLinearUnit(0.01), 16, 3, 3));
             cNN.AddNewLayer(new MaxPooling(2, 2));
 
             cNN.AddNewLayer(new Flatten());
-            cNN.AddNewLayer(new LstmLayer(10));
+
+            cNN.AddNewLayer(new FeedForwardLayer(20, new RectifiedLinearUnit(0.01)));
             cNN.AddNewLayer(new FeedForwardLayer(2, new SoftmaxUnit()));
+
+            Console.WriteLine(cNN);
+
 
 
             GraphCPU graph = new GraphCPU(false);
-
-
-
+            
             NNValue nValue = NNValue.Random(28, 28, 2, random);
             NNValue nValue1 = NNValue.Random(28, 28, 2, random);
             NNValue outp = new NNValue(new double[]{ 0,1});
@@ -53,7 +65,8 @@ namespace CnnTest
 
 
 
-            TrainerCPU trainer = new TrainerCPU();
+            TrainerCPU trainer = new TrainerCPU(TrainType.MiniBatch, new Adam());
+            trainer.BatchSize = 2;
             trainer.Train(10000, 0.001, cNN, data, 2, 0.0001);
             double[] dbs = cNN.Activate(nValue, graph).DataInTensor;
             double[] dbs1 = cNN.Activate(nValue1, graph).DataInTensor;

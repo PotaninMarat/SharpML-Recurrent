@@ -20,6 +20,8 @@ namespace SharpML.Networks.Recurrent
         /// </summary>
         public Shape OutputShape { get; private set; }
 
+        public int TrainableParameters =>  4 * OutputShape.H* (InputShape.H +  OutputShape.H);
+
         NNValue _wix;
         NNValue _wih;
         NNValue _inputBias;
@@ -183,6 +185,15 @@ namespace SharpML.Networks.Recurrent
             _wch = NNValue.Random(outputDimension, outputDimension, initParamsStdDev, rnd);
             _cellWriteBias = new NNValue(outputDimension);
             ResetState();
+        }
+
+        /// <summary>
+        /// Описание слоя
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Format("LstmLayer       \t|inp: {0} |outp: {1} |Non lin. activate: {3} |TrainParams: {2}", InputShape, OutputShape, TrainableParameters, "sigm/tanh");
         }
     }
 }

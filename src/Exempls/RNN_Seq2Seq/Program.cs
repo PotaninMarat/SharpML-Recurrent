@@ -7,7 +7,10 @@ using SharpML.Trainer;
 using SharpML.Models;
 using SharpML.Util;
 using SharpML.DataStructs;
-using SharpML.Networks.Base;
+using SharpML.Networks;
+using SharpML.Networks.Recurrent;
+using SharpML.Networks.ConvDeconv;
+using SharpML.Trainer.Optimizers;
 
 namespace RNN_Seq2Seq
 {
@@ -71,21 +74,36 @@ namespace RNN_Seq2Seq
 
     public class Seq2Seq
     {
-        INetwork network;
+        NeuralNetwork network;
         Random random = new Random(10);
-        TrainerCPU trainer = new TrainerCPU();
+        TrainerCPU trainer;
 
 
         public Seq2Seq()
         {
-            network = NetworkBuilder.MakeLstm(10, 20, 2, 10, new SoftmaxUnit(), 0.001, random);
+
+            trainer = new TrainerCPU(TrainType.MiniBatch, new Adamax());
+            trainer.BatchSize = 7;
+            trainer.GradientClipValue = 5;
+            
+            network = new NeuralNetwork(random, 0.02);
+
+            network.AddNewLayer(new Shape(11), new GruLayer(20)); // Энкодер
+            network.AddNewLayer(new FeedForwardLayer(7, new RectifiedLinearUnit(0.3))); // Компрессор
+            network.AddNewLayer(new GruLayer(20)); //Декодер 
+            network.AddNewLayer(new FeedForwardLayer(10, new SoftmaxUnit())); //Декодер
+
+
+            Console.WriteLine("\n\tseq2seq\n\n"+network+"\n\n");
+
+
             network.ResetState();
         }
 
         public void Train(List<int[]> inp, List<int[]> outp)
         {
-            trainer.Regularization = 1e-7;
-            trainer.Train(30, 0.002, network, new DataSetSeq2Seq(inp, outp), 2, 0.0001);
+            //trainer.L2Regularization = 1e-6;
+            trainer.Train(50, 0.02, network, new DataSetSeq2Seq(inp, outp), 2, 0.0001);
             Console.WriteLine();
             Console.WriteLine();
         }
@@ -94,20 +112,21 @@ namespace RNN_Seq2Seq
         {
             GraphCPU graph = new GraphCPU(false);
 
-            int indOld = -1;
+            int indOld = 10;
 
             network.ResetState();
             for (int i = 0; i < inp.Length; i++)
             {
-                NNValue valueMatrix = new NNValue(DataSetSeq2Seq.GetValue(inp[i]));
+                NNValue valueMatrix = new NNValue(DataSetSeq2Seq.GetValue(inp[i], 11));
                 network.Activate(valueMatrix, graph);
             }
 
 
             for (int i = 0; i < inp.Length; i++)
             {
-                NNValue valueMatrix = new NNValue(DataSetSeq2Seq.GetValue(indOld));
-                Console.Write(GetInd(network.Activate(valueMatrix, graph)));
+                NNValue valueMatrix = new NNValue(DataSetSeq2Seq.GetValue(indOld,11));
+                indOld = GetInd(network.Activate(valueMatrix, graph));
+                Console.Write(indOld);
             }
 
             Console.WriteLine();
@@ -156,14 +175,20 @@ namespace RNN_Seq2Seq
 
                 for (int j = 0; j < dataInp[i].Length; j++)
                 {
-                    DataStep ds = new DataStep(GetValue(dataInp[i][j]));
+                    DataStep ds = new DataStep(GetValue(dataInp[i][j],11));
                     sequence.Steps.Add(ds);
                 }
 
 
                 for (int j = 0; j < dataOutp[i].Length; j++)
                 {
-                    DataStep ds = new DataStep(GetValue(-1), GetValue(dataOutp[i][j]));
+                    DataStep ds;
+
+                    if (j==0)
+                        ds = new DataStep(GetValue(10,11), GetValue(dataOutp[i][j]));
+                    else 
+                        ds = new DataStep(GetValue(dataOutp[i][j-1], 11), GetValue(dataOutp[i][j]));
+
                     sequence.Steps.Add(ds);
                 }
 
@@ -175,16 +200,16 @@ namespace RNN_Seq2Seq
 
 
 
-        public static double[] GetValue(int ind)
+        public static double[] GetValue(int ind, int n = 10)
         {
             if (ind < 0)
             {
-                double[] dbs = new double[10];
+                double[] dbs = new double[n];
                 return dbs;
             }
             else
             {
-                double[] dbs = new double[10];
+                double[] dbs = new double[n];
                 dbs[ind] = 1;
                 return dbs;
             }

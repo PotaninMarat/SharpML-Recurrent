@@ -70,6 +70,7 @@
     <Compile Include="Networks\ConvDeconv\Flatten.cs" />
     <Compile Include="Networks\ConvDeconv\MaxPooling.cs" />
     <Compile Include="Networks\ConvDeconv\ReShape.cs" />
+    <Compile Include="Networks\ConvDeconv\UnPooling.cs" />
     <Compile Include="Networks\Recurrent\RnnLayer.cs" />
     <Compile Include="Activations\RectifiedLinearUnit.cs" />
     <Compile Include="Networks\NeuralNetwork.cs" />
@@ -84,13 +85,22 @@
     <Compile Include="Models\IRunnable.cs" />
     <Compile Include="Models\NNValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Trainer\IOptimizer.cs" />
     <Compile Include="Trainer\ITrainer.cs" />
+    <Compile Include="Trainer\Optimizers\Adadelta.cs" />
+    <Compile Include="Trainer\Optimizers\Adagrad.cs" />
+    <Compile Include="Trainer\Optimizers\Adamax.cs" />
+    <Compile Include="Trainer\Optimizers\MyOptimizer.cs" />
+    <Compile Include="Trainer\Optimizers\RMSProp.cs" />
+    <Compile Include="Trainer\Optimizers\Adam.cs" />
+    <Compile Include="Trainer\Optimizers\Nesterov.cs" />
+    <Compile Include="Trainer\Optimizers\SGD.cs" />
     <Compile Include="Trainer\TrainerCPU.cs" />
     <Compile Include="Util\Binary.cs" />
-    <Compile Include="Util\NetworkBuilder.cs" />
     <Compile Include="Util\Saver.cs" />
     <Compile Include="Util\Util.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

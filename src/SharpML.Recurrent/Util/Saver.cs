@@ -9,8 +9,8 @@ namespace SharpML.Util
         public static void FFNNW_Save(INetwork network, string pathFolder)
         {
             string setting = "\\set.ffnnw";
-            string bias = "\\bias.txtvector";
-            string w = "\\w.txtmatrix";
+            string bias = "b.txt";
+            string w = "w.txt";
 
             if (!Directory.Exists(pathFolder))
             {
@@ -26,15 +26,15 @@ namespace SharpML.Util
                 var lay = (item as FeedForwardLayer);
                 layers[i] = lay._w.W + " " + lay._w.H + " " + Compress(lay._f.ToString());
 
-                string layPath = pathFolder + "\\" + i;
+                string layPath = pathFolder+"\\"+i;
 
                 if (!Directory.Exists(layPath))
                 {
                     Directory.CreateDirectory(layPath);
                 }
 
-                lay._w.SaveAsText(layPath + w);
-                lay._b.SaveAsText(layPath + bias);
+                lay._w.SaveAsTextNoInfo(layPath + w);
+                lay._b.SaveAsTextNoInfo(layPath + bias);
                 i++;
             }
 

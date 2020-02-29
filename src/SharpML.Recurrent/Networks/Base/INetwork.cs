@@ -7,7 +7,8 @@ namespace SharpML.Networks.Base
     public interface INetwork 
     {
         Shape InputShape { get; set; }
-        Shape OutputShape { get;}
+        Shape OutputShape { get; }
+        int TrainableParameters { get; }
         List<ILayer> Layers { get; set; }
         NNValue Activate(NNValue input, IGraph g);
         void ResetState();

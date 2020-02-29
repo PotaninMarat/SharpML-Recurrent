@@ -68,5 +68,10 @@ namespace SharpML.DataStructs
             return valRes;
         }
 
+        public override string ToString()
+        {
+            return string.Format("[H:{0}, W:{1}, D:{2}]", H, W, D);
+        }
+
     }
 }

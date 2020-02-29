@@ -13,6 +13,22 @@ namespace SharpML.Networks
         public List<ILayer> Layers { get; set; }
         public Shape InputShape { get; set; }
         public Shape OutputShape { get; private set; }
+
+        public int TrainableParameters
+        {
+            get
+            {
+                var trpar = 0;
+
+                for (int i = 0; i < Layers.Count; i++)
+                {
+                    trpar += Layers[i].TrainableParameters;
+                }
+
+                return trpar;
+            }
+        }
+
         Random random;
         double std;
 
@@ -36,9 +52,9 @@ namespace SharpML.Networks
         /// <param name="layer">Слой</param>
         public void AddNewLayer(ILayer layer)
         {
-            OutputShape = Layers[Layers.Count - 1].OutputShape;
-
-            layer.Generate(OutputShape, random, std);
+            OutputShape = layer.OutputShape; 
+            var shape = Layers[Layers.Count - 1].OutputShape;
+            layer.Generate(shape, random, std);
             Layers.Add(layer);
 
             if (Layers.Count == 1)
@@ -52,6 +68,8 @@ namespace SharpML.Networks
         /// <param name="layer">Слой</param>
         public void AddNewLayer(Shape inpShape, ILayer layer)
         {
+
+            OutputShape = layer.OutputShape;
             layer.Generate(inpShape, random, std);
             Layers.Add(layer);
 
@@ -85,6 +103,24 @@ namespace SharpML.Networks
                 result.AddRange(layer.GetParameters());
             }
             return result;
+        }
+
+        /// <summary>
+        /// Описание слоя
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            string layersInfo = "";
+
+            for (int i = 0; i < Layers.Count; i++)
+            {
+                layersInfo += Layers[i].ToString() + "\n";
+            }
+
+            layersInfo += string.Format("\n\ninp: {0} | outp: {1} | trainable parameters: {2}", InputShape, OutputShape, TrainableParameters);
+
+            return layersInfo; 
         }
     }
 }

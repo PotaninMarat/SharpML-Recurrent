@@ -41,5 +41,10 @@ namespace SharpML.Activations
 
             return valueMatrix;
         }
+
+        public override string ToString()
+        {
+            return "Softmax";
+        }
     }
 }
